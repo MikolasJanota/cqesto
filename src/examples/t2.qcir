@@ -1,0 +1,10 @@
+#QCIR-G14
+#
+forall(x1)
+exists(x2)
+# end of prefix
+#
+output(g)
+g=Xor(x1,x2)
+#
+# end of circuit

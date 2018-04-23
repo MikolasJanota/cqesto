@@ -1,0 +1,11 @@
+#QCIR-G14
+#
+exists(x1,x2,x3)
+# end of prefix
+#
+output(g4)
+g6=And(x2,x3)
+g5=Or(x1,-g6)
+g4=And(x3,g5)
+#
+# end of circuit

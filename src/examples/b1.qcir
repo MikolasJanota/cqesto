@@ -1,0 +1,8 @@
+#QCIR-G14
+# LastVar 4
+exists( )
+forall( 4 , 3 )
+output( 8 )
+6 = or(-4, 3)
+7 = or(3, -4)
+8 = or(6, 7)

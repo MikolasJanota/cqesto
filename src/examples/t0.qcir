@@ -1,0 +1,12 @@
+#QCIR-G14
+#
+#a simple problem Ex1 Ay2. x1 OR x2
+#
+exists(x1)
+forall(x2)
+# end of prefix
+#
+output(g)
+g=And(x1,x2)
+#
+# end of circuit
