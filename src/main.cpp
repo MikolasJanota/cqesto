@@ -44,6 +44,7 @@ int main(int argc, char** argv) {
   cout << "c MINGW version." << endl;
 #endif
   cout<<"c cqesto, v00.0, "<<GITHEAD<<endl;
+  cout<<"c (C) 2015 Mikolas Janota, mikolas.janota@gmail.com"<<endl;
   signal(SIGTERM, SIG_handler);
   signal(SIGINT, SIG_handler);
   signal(SIGABRT, SIG_handler);
