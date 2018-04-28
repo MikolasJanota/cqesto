@@ -32,19 +32,37 @@ int main(int argc, char** argv) {
 #ifndef NDEBUG
   cout << "c DEBUG version." << endl;
 #endif
-#ifndef NDEBUG
+#ifdef STATIC
   cout << "c STATIC version." << endl;
+#else
+  cout << "c DYNLINK version." << endl;
 #endif
 #ifndef __MINGW32__
   signal(SIGHUP, SIG_handler);
   signal(SIGUSR1, SIG_handler);
 #else
-  cout << "c  MINGW version." << endl;
+  cout << "c MINGW version." << endl;
 #endif
   cout<<"c cqesto, v00.0, "<<GITHEAD<<endl;
   signal(SIGTERM, SIG_handler);
   signal(SIGINT, SIG_handler);
   signal(SIGABRT, SIG_handler);
+#ifndef EXPERT
+  // prepare nonexpert options
+  const int nargc = 3;
+  char* nargv[nargc];
+  nargv[0] = argv[0];
+  nargv[1] = strdup("-es");
+  nargv[2] = argc>=2 ? argv[1] : strdup("-");
+  if (argc>2) {
+    cerr<<"ERROR: ingoring some options after FILENAME"<<std::endl;
+    return 100;
+  }
+  argv=nargv;
+  argc=nargc;
+#else
+  cout<<"c WARNING: running in the EXPERT mode, I'm very stupid without any options."<<std::endl;
+#endif
   Options options;
   if (!options.parse(argc, argv)) {
     cerr << "ERROR: processing options." << endl;

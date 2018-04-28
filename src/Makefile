@@ -15,6 +15,10 @@ CFLAGS+=-pg
 LNFLAGS+=-pg
 endif
 
+ifdef EXPERT # allows using giving options, without options the solver's fairly dumb
+CFLAGS+=-DEXPERT
+endif
+
 ifdef DBG
 CFLAGS+=-O0
 CFLAGS+=-ggdb
