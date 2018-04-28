@@ -1,0 +1,95 @@
+% File:  statement.tex
+% Author: mikolas
+% Created on: 13 Feb 2018 13:38:26
+% Copyright (C) 2018, Mikolas Janota
+\documentclass[a4paper,12pt]{article}
+%\usepackage[hmargin=2.5cm,vmargin=1.5cm,a4paper]{geometry}
+\usepackage{xspace}
+\usepackage{amsmath,amssymb}
+\usepackage{paralist}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{tikz}
+\usepackage{palatino} % Uncomment to use the Palatino font
+\def\miko{Mikol\'a\v{s} Janota}
+\newcommand{\firstPlace}{$\mathbf{1}^\textbf{st}$ \textbf{place}\xspace}
+% ------------------------------- Hyperref -------------------------------------
+\usepackage{color}
+\definecolor{citeblue}{rgb}{0.1,0,.4}
+\definecolor{refcolor}{rgb}{0,0,0.4}
+\definecolor{midgreen}{RGB}{0,150,0}
+\definecolor{darkgreen}{RGB}{0,128,0}
+\definecolor{darkblue}{RGB}{0,0,128}
+\definecolor{darkred}{RGB}{192,0,0}
+\definecolor{dgray}{rgb}{.3,.3,.3}
+\usepackage[pdftex%
+,colorlinks=true%
+,bookmarks=true%
+,linkcolor=citeblue%
+,citecolor=citeblue%
+,urlcolor=blue%
+,plainpages=false]{hyperref}
+\hypersetup{pdfauthor={{\miko}}}
+% ------------------------------- hdr -------------------------------------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+%\headheight 16pt
+\definecolor{dgray}{rgb}{.3,.3,.3}
+%\rhead{\textcolor{dgray}{\PROJECT}}
+%\chead{\textcolor{dgray}{Part B1}}
+%\lhead{\textcolor{dgray}{Janota}}
+%\cfoot{Page \thepage \ of 13}
+%\cfoot{}
+%\lfoot{\textcolor{dgray}{{\miko}, 2018}}
+%\renewcommand{\footrulewidth}{0.4pt}
+%\renewcommand{\headrulewidth}{0pt}
+% -------------------------------------------------------------------------
+\def\theTitle{CQESTO, QBF Solver}
+\title{\theTitle}
+\author{{\miko}\\
+IST/INESC-ID,\\
+University of Lisbon, Portugal\\
+\href{mailto:mikolas.janota@gmail.com}{mikolas.janota@gmail.com}
+}
+% -------------------------------------------------------------------------
+\begin{document}
+%\setcounter{page}{1}
+%{\Large\bf Instituto Superior T\'{e}cnico}
+%\par\noindent\rule{\textwidth}{0.4pt}
+%{\large\bf QFUN, QBF Solver}
+%\noindent\rule{\textwidth}{0.4pt}
+%\end{center}
+\maketitle
+
+CQESTO is a solver for \emph{quantified Boolean formulas (QBF)} that 
+is inspired by my older solver QESTO~\cite{janota-ijcai15}.
+The details of CQESTO can be found in my SAT 2018 publication~\cite{janota-sat18}.
+
+Like in QESTO, CQESTO maintains a propositional formula $\alpha_i$
+for each quantification level $i$.
+This formula determines the possible moves of the corresponding player at that position.
+Consequently, the formula is solved if one of $\alpha_1,\alpha_2$ becomes unsatisfiable.
+The solver applies a SAT solver to solve each $\alpha_i$,
+i.e.\ there may be exponentially many SAT calls throughout the run of the algorithm.
+In this sense it is similar to other solvers like RAReQS~\cite{janota-sat11,janota-sat12,janota-ai16}. However, it is much more lightweight. CQESTO differs from QESTO 
+by enabling calculation directly on circuits rather than CNF.
+%
+CQESTO is closely related to CAQE~\cite{RabeFMCAD15} and QuAbS~\cite{TentrupSAT16} as discussed in the CQESTO paper.
+
+Compared to the 2017 submission, the solver is now  \emph{not} running the preprocessing script by Will Klieber,
+which was struggling on some larger instances so in the end it didn't really pay off.
+The rest is the same as 2017.
+
+\noindent{\it Information about the solver:}
+
+\noindent\begin{tabular}{ll}
+     authors:& \miko\\
+     source:& \url{https://github.com/MikolasJanota/cqesto}\\
+     license:& GNU General Public License
+\end{tabular}
+
+% --------------------------------------------------------------------
+\bibliographystyle{alpha}
+\bibliography{refs}
+% --------------------------------------------------------------------
+\end{document}
