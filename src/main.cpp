@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
 #ifndef NDEBUG
   cout << "c DEBUG version." << endl;
 #endif
-#ifdef STATIC
+#ifdef STATICLN
   cout << "c STATIC version." << endl;
 #else
   cout << "c DYNLINK version." << endl;

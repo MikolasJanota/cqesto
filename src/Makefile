@@ -56,6 +56,7 @@ CFLAGS+=-I./minisat/
 
 ifdef STATIC
 CFLAGS+=-static
+CFLAGS+=-DSTATICLN
 LNFLAGS+=-static
 endif
 
