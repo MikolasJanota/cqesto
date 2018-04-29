@@ -76,6 +76,10 @@ by enabling calculation directly on circuits rather than CNF.
 %
 CQESTO is closely related to CAQE~\cite{RabeFMCAD15} and QuAbS~\cite{TentrupSAT16} as discussed in the CQESTO paper.
 
+There are no major differences between this implementation and the algorithm described in the paper.
+The circuits are represented in hash-consed structures and  the solver
+performs some lightweight simplifications, e.g.\ propagation of unit literals.
+
 Compared to the 2017 submission, the solver is now  \emph{not} running the preprocessing script by Will Klieber,
 which was struggling on some larger instances so in the end it didn't really pay off.
 The rest is the same as 2017.
