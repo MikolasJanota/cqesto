@@ -25,6 +25,7 @@ yy_input_t *yy_input;
 %%
 
 <INITIAL>"#QCIR-G14"  { return FORMAT_ID; }
+<INITIAL>"#QCIR-14"  { return FORMAT_ID; }
 <INITIAL>[-+]?[0-9]+  {
   VAL.val = strtol(yytext, 0, 10);
   if (errno == ERANGE) return ERROR_TOKEN;
