@@ -57,10 +57,6 @@ CFLAGS+=-DSTATICLN
 LNFLAGS+=-static
 endif
 
-ifdef USE_SIMP
-CFLAGS+=-DUSE_SIMP
-endif
-
 ifdef NON_INCR
 CFLAGS+=-DNON_INCR
 endif

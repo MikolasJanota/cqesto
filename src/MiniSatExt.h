@@ -8,11 +8,7 @@
 #define	MINISATEXT_HH
 #include "auxiliary.h"
 #include <vector>
-#if USE_SIMP
-#include "simp/SimpSolver.h"
-#else
 #include "minisat/core/Solver.h"
-#endif
 
 namespace SATSPC {
   class MiniSatExt : public Solver {
