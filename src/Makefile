@@ -42,9 +42,6 @@ endif
 
 CFLAGS += -Wall -Wextra -DBUILDDATE='"$(BUILDDATE)"' -DDISTDATE='"$(DISTDATE)"'
 CFLAGS += -DCHANGESET='"$(CHANGESET)"' -DRELDATE='"$(RELDATE)"'
-#CFLAGS+=-D __STDC_LIMIT_MACROS -D __STDC_FORMAT_MACROS -Wno-parentheses -Wno-deprecated
-#CFLAGS+=-std=c++0x
-#CFLAGS+=-std=gnu++11
 CFLAGS+=-std=c++11
 CFLAGS+=-pedantic
 CFLAGS+=-MMD
@@ -71,11 +68,11 @@ endif
 .PHONY: satmake
 
 all:  make_defs satmake
-	make  source
-	make  cqesto
+	$(MAKE)  source
+	$(MAKE)  cqesto
 
 satmake:
-	@cd ./minisat ; make CXX=$(CXX) $(MSAT)
+	@cd ./minisat ; $(MAKE) CXX=$(CXX) $(MSAT)
 
 make_defs:
 	@./update_defs.sh
@@ -113,6 +110,6 @@ $(MINISAT_LIB): satmake
 ## Clean rule
 clean:
 	@rm -f cqesto cqesto.exe $(COBJS) *.tab.[ch]
-	cd ./minisat/; make clean
+	cd ./minisat/; $(MAKE) clean
 
 -include ${DEPENDS}
