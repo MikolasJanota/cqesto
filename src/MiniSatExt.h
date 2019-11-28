@@ -35,8 +35,7 @@ namespace SATSPC {
       const Var v = *variable_index;
       if (max_id < v) max_id = v;
     }
-    return new_variables(max_id);    
+    return new_variables(max_id);
   }
 }
 #endif	/* MINISATEXT_HH */
-
