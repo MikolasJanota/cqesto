@@ -4,7 +4,7 @@
 #include "Visitors.h"
 #include "VariableManager.h"
 #include "minisat_auxiliary.h"
-#include "MiniSatExt.h"
+#include "minisat_ext.h"
 namespace qesto {
    class EncoderToSAT : private MemoizedExpressionVisitor<Lit> {
    public:
@@ -25,6 +25,8 @@ namespace qesto {
          return v;
       }
 
+#ifdef USE_MINISAT
+      // try to identify variables set to a constant by unit propagation in the sat solver
       inline lbool get_val(ID n) {
          const auto i=get_m().find(n);
          if(i==get_m().end()) return Minisat::l_Undef;
@@ -33,11 +35,10 @@ namespace qesto {
          const auto vv=sat_solver.value(v);
          return sign(l) ? SATSPC::neg(vv) : vv;
       }
+#endif
 
       void set_polarity(ID node, bool polarity) {
         const Lit en=(*this)(node);
-        //std::cerr<<"setting lit "<<en<<" to "<<polarity<<std::endl;
-        //std::cerr<<"setting var "<<var(en)<<" to "<<(polarity==sign(en))<<std::endl;
         sat_solver.setPolarity(var(en), polarity==sign(en) ? Minisat::l_True : Minisat::l_False);
       }
 
@@ -89,10 +90,9 @@ namespace qesto {
 
       Lit new_lit() {
          const Var v = variable_manager.new_var();
-         while (sat_solver.nVars() <= v) sat_solver.newVar();
+         sat_solver.new_variables(v);
          return mkLit(v);
       }
    };
 }
 #endif
-

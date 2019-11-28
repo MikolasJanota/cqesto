@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <iostream>
 #include "auxiliary.h"
-#include "MiniSatExt.h"
+#include "minisat_ext.h"
 #include <ostream>
 #include <vector>
 #include <map>

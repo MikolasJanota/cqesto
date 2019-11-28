@@ -37,6 +37,14 @@ int main(int argc, char** argv) {
 #else
   cout << "c DYNLINK version." << endl;
 #endif
+
+#ifdef USE_IPASIR
+    cout << "c solver IPASIR (cadical)" << endl;
+#endif/*USE_IPASIR*/
+#ifdef USE_MINISAT
+    cout << "c solver MINISAT" << endl;
+#endif/*USE_MINISAT*/
+
 #ifndef __MINGW32__
   signal(SIGHUP, SIG_handler);
   signal(SIGUSR1, SIG_handler);

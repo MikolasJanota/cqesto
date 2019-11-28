@@ -72,7 +72,6 @@ bool LevelSolver::solve(const Substitution& assumptions) {
    cut2id.clear();
    FOR_EACH(i,fc.get_cut()) {
       const auto l=*i;
-//      std::cerr<<"cut:";(*dprn)(l)<<"="<<ev(l)<<std::endl;
       assert(ev(l)!=l_Undef);
       const auto el=enc(l);
       cut.push(el);

@@ -10,7 +10,7 @@
 #include <unordered_map>
 #include <random>
 #include "Expressions.h"
-#include "MiniSatExt.h"
+#include "minisat_ext.h"
 #include "EncoderToSAT.h"
 #include "LevelInfo.h"
 #include "minisat_auxiliary.h"
@@ -29,8 +29,7 @@ namespace qesto {
       ID learn(const std::unordered_set<Var>& dom, const Substitution& opp);
       lbool val(Var v) const {
          assert(vars.count(v));
-         const auto& m=sat.model;
-         return v<m.size() ? m[v] : Minisat::l_Undef;
+         return sat.get_model_value(v);
       }
       const std::unordered_set<Var>& get_dom_vars() const { return dom_vars; }
       void randomize();

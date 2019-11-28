@@ -20,11 +20,7 @@
 #define __PL (std::cerr << __FILE__ << ":" << __LINE__ << std::endl).flush();
 #define FOR_EACH(index,iterated)\
   for (auto index = (iterated).begin(); index != (iterated).end();++index)
-#ifdef USE_GL
-#define SATSPC Glucose
-#else
 #define SATSPC Minisat
-#endif
 
 #ifdef __MINGW32__
 static inline double read_cpu_time() {return 0;}

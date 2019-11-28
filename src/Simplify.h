@@ -7,7 +7,6 @@
 namespace qesto {
    class Simplify : private Transform {
    public:
-
       Simplify(const Options& options,
         Expressions& factory, EncoderToSAT& enc)
       : Transform(factory)
@@ -19,19 +18,21 @@ namespace qesto {
          return visit(expression);
       }
 
-      virtual ID visit(ID node) {
+#ifdef USE_MINISAT
+      virtual ID visit(ID node) override {
          const lbool nv=enc.get_val(node);
          if(nv==Minisat::l_False) return factory.make_false();
          if(nv==Minisat::l_True) return factory.make_true();
          return Transform::visit(node);
       }
+#endif
 
-      virtual ID visit_and(ID node, IDVector operands) {
+      virtual ID visit_and(ID node, IDVector operands) override {
          if (options.get_unit()) return visit_and_or(node, operands, AND);
          else return Transform::visit_and(node, operands);
       }
 
-      virtual ID visit_or(ID node, IDVector operands) {
+      virtual ID visit_or(ID node, IDVector operands) override {
          if (options.get_unit()) return visit_and_or(node, operands, OR);
          else return Transform::visit_or(node, operands);
       }

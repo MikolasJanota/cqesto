@@ -8,10 +8,9 @@
 #define	MINISAT_AUX_HH
 #include <ostream>
 #include "auxiliary.h"
-#include "MiniSatExt.h"
+#include "minisat_ext.h"
 using std::ostream;
 using std::vector;
-using SATSPC::Solver;
 using SATSPC::lbool;
 using SATSPC::mkLit;
 using SATSPC::sign;
@@ -19,16 +18,13 @@ using SATSPC::var;
 using SATSPC::vec;
 using SATSPC::Lit;
 using SATSPC::Var;
-//typedef std::vector<Lit>                      LiteralVector;
 namespace SATSPC {
 ostream& print_model(ostream& out, const vec<lbool>& lv);
 ostream& print_model(ostream& out, const vec<lbool>& lv, int l, int r);
 ostream& print(ostream& out, const vec<Lit>& lv);
 ostream& print(ostream& out, const vector<Lit>& lv);
-//std::ostream& print_lit(std::ostream& out, Lit l);
 ostream& operator << (ostream& outs, Lit lit);
 ostream& operator << (ostream& outs, lbool lb);
-//ostream& operator << (ostream& outs, LiteralVector ls);
 
 inline ostream& operator << (ostream& outs, const vec<Lit>& lv) {
   return print(outs, lv);
@@ -56,7 +52,7 @@ inline void to_lits(const vec<lbool>& bv, vec<Lit>& output, int s, const int e) 
   }
 }
 
-inline std::ostream& operator << (std::ostream& out, Lit l) { 
+inline std::ostream& operator << (std::ostream& out, Lit l) {
    if (l==SATSPC::lit_Undef) return out<<"lit_Undef";
    return out << (sign(l) ? "-" : "+") << var(l);
 }
@@ -77,10 +73,10 @@ inline SATSPC::lbool neg(SATSPC::lbool v) {
 }
 
 inline lbool eval_(Lit literal, const vec<lbool>& vals) {
-    const auto variable=var(literal);        
+    const auto variable=var(literal);
     assert(variable<vals.size());
     assert(0<=variable);
-    return sign(literal) ? neg(vals[variable]) : vals[variable];    
+    return sign(literal) ? neg(vals[variable]) : vals[variable];
 }
 
 
