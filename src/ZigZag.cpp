@@ -113,6 +113,8 @@ lbool ZigZag::solve_(int confl_budget) {
              for (Var v : formula.pref[0].second) {
                if (solvers[0]->val(v) == l_True) {
                  printf(" %d", v);
+               } else {
+                 printf(" -%d", v);
                }
              }
              printf(" 0\n");
