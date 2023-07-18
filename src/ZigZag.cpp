@@ -106,7 +106,19 @@ lbool ZigZag::solve_(int confl_budget) {
          if(verb)std::cerr<<"conflicts:"<<conflict_count<<std::endl;
          const int bt=solvers[lev]->analyze();
          if(verb)std::cerr<<"bt:"<<bt<<std::endl;
-         if(bt<0) return qt==UNIVERSAL ? l_True : l_False;
+         if(bt<0) {
+           if (levels.level_type(0) != qt) {
+             printf("v");
+             //for (Var v : solvers[0]->get_dom_vars()) {
+             for (Var v : formula.pref[0].second) {
+               if (solvers[0]->val(v) == l_True) {
+                 printf(" %d", v);
+               }
+             }
+             printf(" 0\n");
+           }
+           return qt==UNIVERSAL ? l_True : l_False;
+         }
          const size_t btx=(size_t)bt;
          Substitution opp;
          while(trail.size()) {
