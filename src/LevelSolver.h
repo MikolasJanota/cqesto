@@ -20,8 +20,13 @@ namespace qesto {
    class LevelSolver {
    public:
       enum VarType { PLAYER, OPPONENT, AUX };
+#ifdef USE_SMS
+      LevelSolver(const Options& options,
+                  Expressions& factory,  size_t lev, configSolver config, const LevelInfo& levs);
+#else
       LevelSolver(const Options& options,
                   Expressions& factory,  size_t lev, const LevelInfo& levs);
+#endif
       void add_var(Var v, VarType player);
       void add_constr(ID c);
       bool solve(const Substitution& assumptions);

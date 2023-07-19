@@ -15,12 +15,38 @@ using Minisat::l_Undef;
 
 void ZigZag::init() {
    solvers.resize(levels.qlev_count()+1,NULL);
+   // TODO have to initialize SMS edge variables in config, and also observedVars
+   // actually, would be best to provide a sane factory default for config, based on vertices
+
    for(size_t ql=0;ql<=levels.qlev_count();++ql) {
       const QuantifierType qt=
                ql<levels.qlev_count() ?  levels.level_type(ql)
                                       : opponent(levels.level_type(levels.qlev_count()-1));
+#ifdef USE_SMS
+      configSolver config = {};
+      config.vertices = 1;
+      config.nextFreeVariable = 1;
+      config.chechSolutionInProp = false;
+      if (ql == 0) {
+        config.vertices = 5;
+        config.turnoffSMS = false;
+      } else {
+        config.vertices = 2;
+        config.turnoffSMS = true;
+      }
+      config.initialPartition = std::vector<bool>(config.vertices, false);
+      config.initialPartition[0] = true;
+      make_edge_vars(config);
+
+      solvers[ql]=new LevelSolver(options,factory,ql,config,levels);
+#else
       solvers[ql]=new LevelSolver(options,factory,ql,levels);
+#endif
       LevelSolver& s = *(solvers[ql]);
+      /* TODO:SMS override MiniSatExt class so as to always init SMS with 1 vertex and no mincheck
+         except when ql==0, in that case pass special arguments from here to give the number of
+         vertices, and init MiniSatExt differently.
+         */
       for(size_t j=0;j<=min(ql,levels.qlev_count()-1);++j) {
          FOR_EACH(vi,levels.level_vars(j))
            s.add_var(*vi,qt==levels.level_type(j) ?

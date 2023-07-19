@@ -11,6 +11,7 @@ class VariableManager {
 public:
   VariableManager(const VariableManager& o) : last(o.last) { }
   VariableManager() : last(0) { }
+  VariableManager(Var v) : last(v) { }
   VariableManager& operator=(const VariableManager& o) {
     last=o.last;
     return *this;

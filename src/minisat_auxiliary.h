@@ -15,7 +15,7 @@ using SATSPC::lbool;
 using SATSPC::mkLit;
 using SATSPC::sign;
 using SATSPC::var;
-using SATSPC::vec;
+//using SATSPC::vec;
 using SATSPC::Lit;
 using SATSPC::Var;
 namespace SATSPC {
