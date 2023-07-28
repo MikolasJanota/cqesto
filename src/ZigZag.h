@@ -6,59 +6,51 @@
  */
 
 #ifndef ZIGZAG_H
-#define	ZIGZAG_H
-#include "qtypes.h"
+#define ZIGZAG_H
 #include "LevelInfo.h"
 #include "LevelSolver.h"
+#include "qtypes.h"
 namespace qesto {
-extern NiceExpressionPrinter* dprn;
+extern NiceExpressionPrinter *dprn;
 
-   class ZigZag {
-   public:
-
-      ZigZag(const Options& options,
-             Expressions& factory, QFla& qf)
-      : options(options)
-      , factory(factory)
-      , levels(qf.pref)
-      , formula(qf)
-      , conflict_count(0)
-      , verb(options.get_verbose()) {
-        if(options.get_verbose()>3) {
-          std::cerr<<"input"<<std::endl; (*dprn)(qf.output)<<std::endl;
+class ZigZag {
+  public:
+    ZigZag(const Options &options, Expressions &factory, const QFla &qf)
+        : options(options), factory(factory), levels(qf.pref), formula(qf),
+          conflict_count(0), verb(options.verbose) {
+        if (options.verbose > 3) {
+            std::cerr << "input" << std::endl;
+            (*dprn)(qf.output) << std::endl;
         }
-         init();
-      }
+        init();
+    }
 
-      bool solve();
-      std::ostream& print_stats(std::ostream& o) {
-        return o<<"c bt_count:"<<conflict_count<<std::endl;
-      }
-   private:
-      lbool solve_(int confl_budget);
-      void randomize();
+    bool solve();
+    std::ostream &print_stats(std::ostream &o) {
+        return o << "c bt_count:" << conflict_count << std::endl;
+    }
 
-      struct Decision {
-         Decision(QuantifierType player,
-                  Lit decision_literal)
-         : player(player)
-         , decision_literal(decision_literal)
-         {
-         }
+  private:
+    lbool solve_(int confl_budget);
+    void randomize();
 
-         QuantifierType player;
-         Lit decision_literal;
-      };
+    struct Decision {
+        Decision(QuantifierType player, Lit decision_literal)
+            : player(player), decision_literal(decision_literal) {}
 
-      const Options& options;
-      Expressions& factory;
-      LevelInfo levels;
-      QFla formula;
-      std::vector<LevelSolver*> solvers;
-      size_t conflict_count;
-      void init();
-      int verb;
-   };
-}
-#endif	/* ZIGZAG_H */
+        QuantifierType player;
+        Lit decision_literal;
+    };
+
+    const Options &options;
+    Expressions &factory;
+    LevelInfo levels;
+    QFla formula;
+    std::vector<LevelSolver *> solvers;
+    size_t conflict_count;
+    void init();
+    int verb;
+};
+} // namespace qesto
+#endif /* ZIGZAG_H */
 

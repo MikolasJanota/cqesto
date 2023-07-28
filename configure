@@ -1,0 +1,73 @@
+#!/bin/sh
+
+set -e
+set -u
+
+usage () {
+cat <<EOF
+usage: configure [-h|--help][-g|--debug][-e|--expert]
+
+-h | --help    print this command line option summary
+-g | --debug   compile with assertion checking and symbols
+-c | --cadical compile with cadical instead of minisat
+EOF
+}
+
+msg () {
+  echo "[configure] $*"
+}
+
+die () {
+  echo "configure: error: $*" 1>&2
+  exit 1
+}
+
+debug=no
+cadical=no
+
+while [ $# -gt 0 ]
+do
+  case $1 in
+    -h|--help) usage; exit 0;;
+    -g|--debug) debug=yes;;
+    -c|--cadical) cadical=yes;;
+    *) die "invalid option '$1' (try '-h')";;
+  esac
+  shift
+done
+
+CMKFLAGS=""
+
+if [ $cadical = yes ]
+then
+  CMKFLAGS="$CMKFLAGS -DUSE_CADICAL=ON"
+  if [ -d "contrib/cadical" ]; then
+    msg "assuming that cadical is already set up"
+  else
+    msg "setting up cadical SAT solver"
+    (cd contrib ; ./setup-cadical.sh)
+    msg "cadical setup done"
+	fi
+else
+  CMKFLAGS="$CMKFLAGS -DUSE_CADICAL=OFF"
+fi
+
+if [ -d "contrib/minisat" ]; then
+  msg "assuming that minisat is already set up"
+else
+  msg "setting up minisat SAT solver"
+  (cd contrib ; ./setup-minisat.sh)
+  msg "solver done"
+fi
+
+if [ $debug = yes ]
+then
+  CMKFLAGS="$CMKFLAGS -DCMAKE_BUILD_TYPE=Debug"
+else
+  CMKFLAGS="$CMKFLAGS -DCMAKE_BUILD_TYPE=Release"
+fi
+
+mkdir -p build
+cd build
+cmake $CMKFLAGS ..
+msg "all seems in order, now do 'cd build && make'"

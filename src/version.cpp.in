@@ -1,0 +1,11 @@
+/*
+ * File:  version.cpp.in
+ * Author:  mikolas
+ * Created on:  Tue Aug 10 13:58:47 CEST 2021
+ * Copyright (C) 2021, Mikolas Janota
+ */
+#include "version.h"
+
+const std::string Version::GIT_SHA1           = "@GIT_SHA1@";
+const std::string Version::GIT_DATE           = "@GIT_DATE@";
+const std::string Version::GIT_COMMIT_SUBJECT = "@GIT_COMMIT_SUBJECT@";
