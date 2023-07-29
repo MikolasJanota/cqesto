@@ -14,18 +14,17 @@ using SATSPC::mkLit;
 using SATSPC::sign;
 using SATSPC::var;
 using SATSPC::Var;
-using SATSPC::vec;
 using std::ostream;
 using std::vector;
 namespace SATSPC {
-ostream &print_model(ostream &out, const vec<lbool> &lv);
-ostream &print_model(ostream &out, const vec<lbool> &lv, int l, int r);
-ostream &print(ostream &out, const vec<Lit> &lv);
+ostream &print_model(ostream &out, const SATSPC::vec<lbool> &lv);
+ostream &print_model(ostream &out, const SATSPC::vec<lbool> &lv, int l, int r);
+ostream &print(ostream &out, const SATSPC::vec<Lit> &lv);
 ostream &print(ostream &out, const vector<Lit> &lv);
 ostream &operator<<(ostream &outs, Lit lit);
 ostream &operator<<(ostream &outs, lbool lb);
 
-inline ostream &operator<<(ostream &outs, const vec<Lit> &lv) {
+inline ostream &operator<<(ostream &outs, const SATSPC::vec<Lit> &lv) {
     return print(outs, lv);
 }
 
@@ -33,11 +32,11 @@ inline Lit to_lit(Var v, lbool val) {
     return val == l_True ? mkLit(v) : ~mkLit(v);
 }
 
-inline Lit to_lit(const vec<lbool> &bv, Var v) {
+inline Lit to_lit(const SATSPC::vec<lbool> &bv, Var v) {
     return (v < bv.size()) && (bv[v] == l_True) ? mkLit(v) : ~mkLit(v);
 }
 
-inline lbool eval(Lit l, const vec<lbool> &vals) {
+inline lbool eval(Lit l, const SATSPC::vec<lbool> &vals) {
     const Var v = var(l);
     if (v >= vals.size())
         return l_Undef;
@@ -47,7 +46,7 @@ inline lbool eval(Lit l, const vec<lbool> &vals) {
     return (vv == l_False) == (sign(l)) ? l_True : l_False;
 }
 
-inline void to_lits(const vec<lbool> &bv, vec<Lit> &output, int s,
+inline void to_lits(const SATSPC::vec<lbool> &bv, SATSPC::vec<Lit> &output, int s,
                     const int e) {
     for (int index = s; index <= e; ++index) {
         if (bv[index] == l_True)
@@ -83,7 +82,7 @@ inline SATSPC::lbool neg(SATSPC::lbool v) {
     return l_Undef;
 }
 
-inline lbool eval_(Lit literal, const vec<lbool> &vals) {
+inline lbool eval_(Lit literal, const SATSPC::vec<lbool> &vals) {
     const auto variable = var(literal);
     assert(variable < vals.size());
     assert(0 <= variable);
@@ -95,27 +94,6 @@ inline void encode_and_pos(SATSPC::MiniSatExt &solver, Lit representative,
                            const vector<Lit> &rhs) {
     for (size_t i = 0; i < rhs.size(); ++i)
         solver.addClause(~representative, rhs[i]);
-}
-
-// AND l_i -> representative
-inline void encode_and_neg(SATSPC::MiniSatExt &solver, Lit representative,
-                           const vector<Lit> &rhs) {
-    vec<Lit> ls(rhs.size() + 1);
-    for (size_t i = 0; i < rhs.size(); ++i)
-        ls[i] = ~rhs[i];
-    ls[rhs.size()] = representative;
-    solver.addClause_(ls);
-}
-
-inline void encode_and(SATSPC::MiniSatExt &solver, Lit representative,
-                       const vector<Lit> &rhs) {
-    vec<Lit> ls(rhs.size() + 1);
-    for (size_t i = 0; i < rhs.size(); ++i) {
-        ls[i] = ~rhs[i];
-        solver.addClause(~representative, rhs[i]);
-    }
-    ls[rhs.size()] = representative;
-    solver.addClause_(ls);
 }
 
 class Lit_equal {

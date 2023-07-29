@@ -78,7 +78,7 @@ class EncoderToSAT : private MemoizedExpressionVisitor<Lit> {
     Lit encode_ops(const IDVector &operands, bool and_op) {
         const Lit r = new_lit();
         const size_t sz = operands.size();
-        vec<Lit> ls(sz + 1);
+        SATSPC::vec<Lit> ls(sz + 1);
         ls[sz] = and_op ? r : ~r;
         for (size_t i = 0; i < sz; ++i) {
             const Lit operand_encoding = visit(operands[i]);

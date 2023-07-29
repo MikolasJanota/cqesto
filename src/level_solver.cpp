@@ -14,7 +14,6 @@
 #include "minisat_auxiliary.h"
 #include <random>
 using namespace qesto;
-using SATSPC::l_Undef;
 
 std::mt19937 LevelSolver::rgen(1);
 
@@ -66,10 +65,10 @@ bool LevelSolver::solve(const Substitution &assumptions) {
     FindCut fc(factory, ev);
     for (const auto &i : constrs)
         fc(i);
-    vec<Lit> cut;
+    SATSPC::vec<Lit> cut;
     cut2id.clear();
     for (const auto &l : fc.get_cut()) {
-        assert(ev(l) != l_Undef);
+        assert(ev(l) != SATSPC::l_Undef);
         const auto el = enc(l);
         cut.push(el);
         cut2id[el] = l;
