@@ -1,7 +1,7 @@
 #pragma once
-#include "EncoderToSAT.h"
-#include "Reduce.h"
-#include "Transform.h"
+#include "encoder_to_sat.h"
+#include "reduce.h"
+#include "transform.h"
 namespace qesto {
 class Simplify : private Transform {
   public:
@@ -81,8 +81,7 @@ class Simplify : private Transform {
         bool lits = false; // there are literals
         bool changed = false;
 
-        FOR_EACH(iterator, operands) {
-            const ID old_n = *iterator;
+        for (const auto &old_n : operands) {
             const ID rn = visit(old_n);
             changed |= rn != old_n;
             changed |= factory.add_operand(new_operands, rn, operation);
@@ -100,8 +99,7 @@ class Simplify : private Transform {
         assert(operation == AND || operation == OR);
         const bool negate = operation == OR;
 
-        FOR_EACH(iterator, operands) {
-            ID n = *iterator;
+        for (const auto &n : operands) {
             if (n.get_type() == LITERAL) {
                 const Lit l = factory.open_lit(n);
                 substitution[var(l)] = negate == sign(l);
@@ -116,8 +114,7 @@ class Simplify : private Transform {
         Reduce reduce(factory, substitution);
         bool changed = false;
 
-        FOR_EACH(iterator, operands) {
-            const ID old_n = *iterator;
+        for (const auto &old_n : operands) {
             if (old_n.get_type() == LITERAL) {
                 new_operands.push_back(old_n);
             } else {

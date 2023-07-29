@@ -1,21 +1,20 @@
 /*
- * File:   LevelSolver.cpp
+ * File:   level_solver.cpp
  * Author: mikolas
  *
  * Created on 18 May 2015, 13:38
  */
 
-#include "LevelSolver.h"
-#include "Eval.h"
-#include "FindCut.h"
-#include "MakePossible.h"
-#include "MaxQLev.h"
+#include "level_solver.h"
 #include "auxiliary.h"
+#include "eval.h"
+#include "find_cut.h"
+#include "make_possible.h"
+#include "max_qlev.h"
 #include "minisat_auxiliary.h"
 #include <random>
 using namespace qesto;
 using SATSPC::l_Undef;
-using SATSPC::lbool;
 namespace qesto {
 extern NiceExpressionPrinter *dprn;
 }
@@ -57,19 +56,22 @@ bool LevelSolver::solve(const Substitution &assumptions) {
     if (options.verbose > 3) {
         std::cerr << "solving" << std::endl;
         std::cerr << "assump";
-        FOR_EACH(i, assumptions)(*dprn) << " " << mkLit(i->first, !(i->second));
+        for (const auto &i : assumptions)
+            (*dprn) << " " << mkLit(i.first, !(i.second));
         std::cerr << "[" << std::endl;
-        FOR_EACH(i, constrs) (*dprn)(*i) << std::endl;
+        for (const auto &i : constrs)
+            (*dprn)(i) << std::endl;
         std::cerr << "]" << std::endl;
     }
     Eval ev(factory, assumptions);
-    FOR_EACH(i, constrs) ev(*i);
+    for (const auto &i : constrs)
+        ev(i);
     FindCut fc(factory, ev);
-    FOR_EACH(i, constrs) fc(*i);
+    for (const auto &i : constrs)
+        fc(i);
     vec<Lit> cut;
     cut2id.clear();
-    FOR_EACH(i, fc.get_cut()) {
-        const auto l = *i;
+    for (const auto &l : fc.get_cut()) {
         assert(ev(l) != l_Undef);
         const auto el = enc(l);
         cut.push(el);
@@ -81,7 +83,7 @@ bool LevelSolver::solve(const Substitution &assumptions) {
 int LevelSolver::analyze() {
     MaxQLev mql(factory, plvars, levs);
     int bt = -1;
-    const auto &confl = sat.conflict;
+    const auto &confl = sat.get_conflict();
     for (int i = 0; i < confl.size(); i++) {
         const auto el = confl[i];
         const auto j = cut2id.find(~el);
@@ -96,7 +98,7 @@ ID LevelSolver::learn(const std::unordered_set<Var> &dom,
                       const Substitution &opp) {
     MakePossible mp(factory, dom, opp);
     vector<ID> ops;
-    const auto &confl = sat.conflict;
+    const auto &confl = sat.get_conflict();
     for (int i = 0; i < confl.size(); i++) {
         const auto el = confl[i];
         const auto j = cut2id.find(~el);
@@ -113,9 +115,11 @@ ID LevelSolver::learn(const std::unordered_set<Var> &dom,
 }
 
 void LevelSolver::randomize() {
+#ifdef USE_MINISAT
     Var v = sat.nVars();
     std::uniform_int_distribution<> d(0, 99);
     while (v--)
         if (d(rgen) < 25)
             sat.bump(v);
+#endif
 }

@@ -1,14 +1,14 @@
 /*
- * File:  Expressions.h
+ * File:  expressions.h
  * Author:  mikolas
  * Created on:  Fri, May 15, 2015 4:52:43 PM
  * Copyright (C) 2015, Mikolas Janota
  */
 #pragma once
-#include "IDVector.h"
-#include "ImmutableVector.h"
-#include "Table.h"
+#include "idvector.h"
+#include "immutable_vector.h"
 #include "options.h"
+#include "table.h"
 namespace qesto {
 typedef ImmutableVector<Var, std::hash<int>> VarVector;
 typedef ImmutableVector_hash<ID, ID_hash> IDVector_hash;
@@ -35,7 +35,7 @@ class Expressions {
             return make_false();
         if (o2.get_type() == FALSE)
             return make_false();
-        vector<ID> dv(2);
+        std::vector<ID> dv(2);
         dv[0] = o1;
         dv[1] = o2;
         return make_and(IDVector(dv));
@@ -50,7 +50,7 @@ class Expressions {
             return make_true();
         if (o2.get_type() == TRUE)
             return make_true();
-        vector<ID> dv(2);
+        std::vector<ID> dv(2);
         dv[0] = o1;
         dv[1] = o2;
         return make_or(IDVector(dv));
@@ -74,7 +74,7 @@ class Expressions {
     const ID open_not(ID node) const;
 
     // returns true for the cases when it does not push o into operands
-    bool add_operand(vector<ID> &operands, ID o, NodeType top_level) {
+    bool add_operand(std::vector<ID> &operands, ID o, NodeType top_level) {
         assert((top_level == OR) || (top_level == AND));
         const NodeType ide = (top_level == OR) ? FALSE : TRUE;
         if (o.get_type() == ide)

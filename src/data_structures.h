@@ -3,6 +3,7 @@
 #include "auxiliary.h"
 #include "minisat_ext.h"
 #include <algorithm>
+#include <cinttypes>
 #include <iostream>
 #include <map>
 #include <ostream>
@@ -11,20 +12,12 @@
 #include <vector>
 
 namespace qesto {
-using SATSPC::lbool;
 using SATSPC::Lit;
-using SATSPC::mkLit;
-using SATSPC::sign;
-using SATSPC::var;
 using SATSPC::Var;
-using SATSPC::vec;
 using std::hash;
 using std::ostream;
 using std::pair;
-using std::unordered_map;
-using std::vector;
 
-typedef unsigned long long uint64;
 #define __PL           (std::cerr << __FILE__ << ":" << __LINE__ << std::endl).flush();
 #define CONTAINS(s, e) (((s).find(e)) != ((s).end()))
 
@@ -43,14 +36,14 @@ class ID {
     ID() : index(-1), type(OR) {}
     inline NodeType get_type() const { return type; }
     inline size_t get_index() const { return index; }
-    inline uint64 toInt() const {
-        return (((uint64)type) << 32) + index;
+    inline uint64_t toInt() const {
+        return (((uint64_t)type) << 32) + index;
     } // Be careful of precedence of "<<"!
-    inline static uint64 toInt(ID id) { return id.toInt(); }
-    static ID fromInt(uint64 i) { return ID(i); }
+    inline static uint64_t toInt(ID id) { return id.toInt(); }
+    static ID fromInt(uint64_t i) { return ID(i); }
 
   private:
-    ID(uint64 i) : index(i & 0xFFFFFFFF), type((NodeType)(i >> 32)) {
+    ID(uint64_t i) : index(i & 0xFFFFFFFF), type((NodeType)(i >> 32)) {
         assert((i >> 32) <= 6);
         // assert(0<=(i>>32));
     };

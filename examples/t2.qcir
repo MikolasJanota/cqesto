@@ -5,6 +5,6 @@ exists(x2)
 # end of prefix
 #
 output(g)
-g=Xor(x1,x2)
+g=xor(x1,x2)
 #
 # end of circuit

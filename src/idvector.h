@@ -1,18 +1,16 @@
 /*
- * File:  IDVector.h
+ * File:  idvector.h
  * Author:  mikolas
  * Created on:  Fri, May 15, 2015 4:49:30 PM
  * Copyright (C) 2015, Mikolas Janota
  */
 #pragma once
-#include "DataStructures.h"
-#include "ImmutableVector.h"
+#include "data_structures.h"
+#include "immutable_vector.h"
 namespace qesto {
 class IDVector : public ImmutableVector<ID, ID_hash> {
   public:
-    IDVector() : ImmutableVector<ID, ID_hash>() {}
-    IDVector(const std::vector<ID> &es) : ImmutableVector<ID, ID_hash>(es) {}
-    IDVector(const IDVector &o) : ImmutableVector<ID, ID_hash>(o) {}
+    using ImmutableVector::ImmutableVector; // inherit constructors
     virtual ~IDVector() {}
 
     inline bool contains_true() { return first(TRUE) < size(); }
@@ -47,4 +45,4 @@ class IDVector : public ImmutableVector<ID, ID_hash> {
         return i < sz && ((*this)[i].get_type() == nt) ? i : sz;
     }
 };
-}
+} // namespace qesto

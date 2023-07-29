@@ -6,42 +6,39 @@
  */
 #include "qcir_parser.h"
 #include "auxiliary.h"
-#include "fmtutils.hh"
+#include "stream_buffer.h"
 #include <cctype>
+#include <cstdlib>
 
 void QCIRParser::parse() { qcir_file(); }
 void QCIRParser::qcir_file() {
     format_id();
-    skip();
-    __PL;
     qblock_prefix();
-    __PL;
     output_stmt();
-    __PL;
     while (!is_end()) {
         gate_stmt();
-        nl();
+        nltoken();
     }
     cb_file_closed();
 }
 
 void QCIRParser::format_id() {
-    match_string("#QCIR-14");
-    nl();
+    match_string("#QCIR-14", false);
+    nltoken();
 }
 
 void QCIRParser::output_stmt() {
     match_string("output");
-    match_char('(');
+    match_char_token('(');
     cb_output_lit(lit());
-    match_char(')');
-    nl();
+    match_char_token(')');
+    nltoken();
 }
 
 void QCIRParser::gate_stmt() {
     cb_gate_stmt_var(var());
-    match_char('=');
-    switch (*d_buf) {
+    match_char_token('=');
+    switch (next()) {
     case 'a':
         match_string("and");
         cb_gate_stmt_gt(GType::AND);
@@ -59,19 +56,20 @@ void QCIRParser::gate_stmt() {
         cb_gate_stmt_gt(GType::ITE);
         break;
     default:
-        err() << "expecting gate operator" << std::endl;
-        exit(EXIT_FAILURE);
+        err() << "expecting gate operator at '" << static_cast<char>(*d_buf)
+              << "'" << std::endl;
+        exit(1);
     }
-    match_char('(');
+    match_char_token('(');
     while (*d_buf != ')') {
         cb_gate_stmt_lit(lit());
         skip();
         if (*d_buf == ',') {
-            match_char(',');
+            match_char_token(',');
             skip();
         }
     }
-    match_char(')');
+    match_char_token(')');
     cb_gate_closed();
 }
 
@@ -96,15 +94,14 @@ bool QCIRParser::qblock_quant() {
         break;
     default: return false;
     }
-    match_char('(');
-    while (true) {
+    match_char_token('(');
+    while (next() != ')') {
         cb_qblock_var(var());
-        skip();
-        if (*d_buf != ',')
-            break;
+        if (next() != ')')
+            match_char_token(',');
     }
-    match_char(')');
-    nl();
+    match_char_token(')');
+    nltoken();
     cb_quant_closed();
     return true;
 }
@@ -112,32 +109,122 @@ bool QCIRParser::qblock_quant() {
 static inline bool is_var_char(char c) { return isalnum(c) || c == '_'; }
 
 std::string QCIRParser::var() {
-    skip();
-    std::stringstream buf;
-    if (!is_var_char(*d_buf)) {
+    d_varbuf.str(std::string());
+    d_varbuf.clear();
+    if (!is_var_char(next())) {
         err() << "expecting variable, found '" << static_cast<char>(*d_buf)
               << "'" << std::endl;
-        exit(EXIT_FAILURE);
+        exit(1);
     }
     while (is_var_char(*d_buf)) {
-        buf << static_cast<char>(*d_buf);
+        d_varbuf.put(static_cast<char>(*d_buf));
         ++d_buf;
     }
-    return buf.str();
+    return d_varbuf.str();
 }
 
 void QCIRParser::lit_list() { skip(); }
 
 QCIRParser::Lit QCIRParser::lit() {
-    skip();
-    const bool sign = *d_buf == '-';
+    const bool sign = next() == '-';
     if (sign)
         ++d_buf;
     return {sign, var()};
 }
 
-void QCIRParser::nl() {
+void QCIRParser::match_string(const char *s, bool run_skip) {
+    if (run_skip)
+        skip();
+    const auto olds = s;
+    for (; *s; ++d_buf, s++) {
+        if (*d_buf == EOF) {
+            err() << "End of file when looking for '" << olds << "'."
+                  << std::endl;
+            exit(1);
+        }
+        const char rc = *d_buf;
+        if (rc != *s) {
+            err() << "Unexpected character '" << rc << "' when looking for '"
+                  << *s << "' in " << olds << "'." << std::endl;
+            exit(1);
+        }
+    }
+}
+
+void QCIRParser::match_char(char c) {
+    if (*d_buf != c) {
+        err() << "'" << c << "' expected instead of '"
+              << static_cast<char>(*d_buf) << "'" << std::endl;
+        exit(1);
+    }
+    ++d_buf;
+}
+
+void QCIRParser::match_char_token(char c) {
     skip();
+    match_char(c);
+}
+
+std::ostream &QCIRParser::err() {
+    if (d_filename.empty())
+        return std::cerr << "ERROR on line" << d_ln << ":";
+    return std::cerr << d_filename << ":" << d_ln << ":";
+}
+
+void QCIRParser::skip_end_of_line() {
+    while (true) {
+        if (*d_buf == EOF)
+            return;
+        ++d_buf;
+    }
+}
+
+int QCIRParser::skip() {
+    int nls = 0;
+    bool comment = false;
+    for (bool stop = false; !stop;) {
+        switch (*d_buf) {
+        case EOF: stop = true; break;
+        case ' ':
+        case '\t': ++d_buf; break;
+        case '\r':
+        case '\n':
+            if (comment) {
+                nlchar();
+                comment = false;
+                nls++;
+            } else
+                stop = true;
+            break;
+        case '#':
+            comment = true;
+            ++d_buf;
+            break;
+        default:
+            if (comment)
+                ++d_buf;
+            else
+                stop = true;
+        }
+    }
+    return nls;
+}
+
+void QCIRParser::nltoken() {
+    if (skip() > 0)
+        return;
+    switch (*d_buf) {
+    case EOF: break;
+    case '\r':
+    case '\n': nlchar(); break;
+    default:
+        err() << "new line expected instead of '" << static_cast<char>(*d_buf)
+              << "'" << std::endl;
+        exit(1);
+    }
+}
+
+void QCIRParser::nlchar() {
     switch (*d_buf) {
     case '\n': ++d_buf; break;
     case '\r':
@@ -145,60 +232,8 @@ void QCIRParser::nl() {
         if (*d_buf == '\n')
             ++d_buf;
         break;
-    default: err() << "expecting" << std::endl; exit(EXIT_FAILURE);
+    default: assert(false);
     }
     d_ln++;
-}
-
-void QCIRParser::match_string(const char *s) {
-    skip(s[0] != '#');
-    const auto olds = s;
-    for (; *s; ++d_buf, s++) {
-        if (*d_buf == EOF) {
-            err() << "End of file when looking for '" << olds << "'."
-                  << std::endl;
-            exit(EXIT_FAILURE);
-        }
-        const char rc = *d_buf;
-        if (rc != *s) {
-            err() << "Unexpected character '" << rc << "' when looking for '"
-                  << *s << "' in " << olds << "'." << std::endl;
-            exit(EXIT_FAILURE);
-        }
-    }
-}
-
-void QCIRParser::match_char(char c) {
-    skip();
-    if (*d_buf != c) {
-        std::cerr << c << " expected" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    ++d_buf;
-}
-std::ostream &QCIRParser::err() { return std::cerr << "ERROR:" << d_ln << ":"; }
-
-void QCIRParser::skip_end_of_line() {
-    while (true) {
-        if (*d_buf == EOF)
-            return;
-        if (*d_buf == '\r' || *d_buf == '\n') {
-            nl();
-            return;
-        }
-        ++d_buf;
-    }
-}
-
-void QCIRParser::skip(bool skipComments) {
-    while (1) {
-        skipTrueWhitespace(d_buf);
-        if (!skipComments)
-            return;
-        if (*d_buf == '#')
-            skipLine(d_buf);
-        else
-            break;
-    }
 }
 

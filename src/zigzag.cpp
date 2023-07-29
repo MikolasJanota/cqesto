@@ -1,11 +1,11 @@
 /*
- * File:   ZigZag.cpp
+ * File:   zigzag.cpp
  * Author: mikolas
  *
  * Created on 18 May 2015, 12:07
  */
 
-#include "ZigZag.h"
+#include "zigzag.h"
 #include "minisat_auxiliary.h"
 using namespace qesto;
 using Minisat::l_False;
@@ -46,8 +46,8 @@ void ZigZag::init() {
             for (size_t j = ql + 1; j < levels.qlev_count(); ++j) {
                 if (levels.level_type(j) != qt)
                     continue;
-                FOR_EACH(i, levels.level_vars(j))
-                solvers[ql]->add_var(*i, LevelSolver::AUX);
+                for (auto i : levels.level_vars(j))
+                    solvers[ql]->add_var(i, LevelSolver::AUX);
             }
             auto &os = qt == UNIVERSAL ? exs : uns;
             Reduce red(factory, os);
@@ -56,7 +56,8 @@ void ZigZag::init() {
             solvers[ql]->add_constr(red(fla));
 
             auto &s = qt == UNIVERSAL ? uns : exs;
-            FOR_EACH(i, levels.level_vars(ql)) s[*i] = false;
+            for (auto i : levels.level_vars(ql))
+                s[i] = false;
         }
     } else {
         solvers[lastlev]->add_constr(lastlevt == EXISTENTIAL
@@ -77,7 +78,9 @@ bool ZigZag::solve() {
         const double rest_base = luby(restart_inc, curr_restarts);
         status = solve_(r ? rest_base * restart_first : -1);
         curr_restarts++;
+#ifdef USE_MINISAT
         randomize();
+#endif
     }
     assert(status != l_Undef);
     return status == l_True;
@@ -101,8 +104,7 @@ lbool ZigZag::solve_(int confl_budget) {
                 : opponent(levels.level_type(levels.qlev_count() - 1));
         if (has_sol) {
             assert(lev < levels.qlev_count());
-            FOR_EACH(vi, levels.level_vars(lev)) {
-                const auto v = *vi;
+            for (auto v : levels.level_vars(lev)) {
                 const bool vv = solvers[lev]->val(v) == l_True;
                 const Lit dl = vv ? mkLit(v) : ~mkLit(v);
                 vals[v] = vv;

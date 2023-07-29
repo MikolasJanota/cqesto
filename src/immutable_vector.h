@@ -1,5 +1,5 @@
 /*
- * File:  ImmutableVector.h
+ * File:  immutable_vector.h
  * Author:  mikolas
  * Created on:  Fri, May 15, 2015 4:47:20 PM
  * Copyright (C) 2015, Mikolas Janota

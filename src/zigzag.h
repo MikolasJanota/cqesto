@@ -1,14 +1,13 @@
 /*
- * File:   ZigZag.h
+ * File:   zigzag.h
  * Author: mikolas
  *
  * Created on 18 May 2015, 12:07
  */
 
-#ifndef ZIGZAG_H
-#define ZIGZAG_H
-#include "LevelInfo.h"
-#include "LevelSolver.h"
+#pragma once
+#include "level_info.h"
+#include "level_solver.h"
 #include "qtypes.h"
 namespace qesto {
 extern NiceExpressionPrinter *dprn;
@@ -52,5 +51,3 @@ class ZigZag {
     int verb;
 };
 } // namespace qesto
-#endif /* ZIGZAG_H */
-

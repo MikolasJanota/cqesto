@@ -1,0 +1,11 @@
+#QCIR-14
+#
+exists(x1,x2,x3,x4)
+# end of prefix
+#
+output(g)
+g1=xor(x1,x2)
+g2=xor(x3,x4)
+g=xor(g1,g2)
+#
+# end of circuit

@@ -1,12 +1,11 @@
 /*
- * File:  Visitors.h
+ * File:  visitor.h
  * Author:  mikolas
  * Created on:  Fri, May 15, 2015 4:52:48 PM
  * Copyright (C) 2015, Mikolas Janota
  */
-#ifndef VISITORS_H_18486
-#define VISITORS_H_18486
-#include "Expressions.h"
+#pragma once
+#include "expressions.h"
 
 namespace qesto {
 template <class R> class ExpressionVisitor {
@@ -95,10 +94,12 @@ class MemoizedExpressionVisitor : public ExpressionVisitor<R> {
     }
 
   protected:
-    inline const unordered_map<ID, R, ID_hash, ID_equal> &get_m() { return m; }
+    inline const std::unordered_map<ID, R, ID_hash, ID_equal> &get_m() {
+        return m;
+    }
 
   private:
-    unordered_map<ID, R, ID_hash, ID_equal> m;
+    std::unordered_map<ID, R, ID_hash, ID_equal> m;
 };
 
 template <class R, class A>
@@ -121,20 +122,20 @@ class MemoizedExpressionArgumentVisitor
     }
 
   private:
-    unordered_map<KeyType, R> m;
+    std::unordered_map<KeyType, R> m;
 };
 
 class ExpressionPrinter : public ExpressionVisitor<std::ostream &> {
   public:
     ExpressionPrinter(std::ostream &output, Expressions &factory)
-        : ExpressionVisitor<std::ostream &>(factory), id_to_orig(NULL),
+        : ExpressionVisitor<std::ostream &>(factory), id_to_orig(nullptr),
           output(output) {}
 
     std::ostream &operator()(ID node) { return visit(node); }
 
     virtual std::ostream &visit_var(Var v) {
         if (id_to_orig) {
-            ID id = ID(LITERAL, SATSPC::toInt(mkLit(v)));
+            ID id = ID(LITERAL, SATSPC::toInt(SATSPC::mkLit(v)));
             int orig = (*id_to_orig)[id.toInt()];
             return output << orig;
         } else {
@@ -145,7 +146,6 @@ class ExpressionPrinter : public ExpressionVisitor<std::ostream &> {
     virtual std::ostream &visit_lit(ID, Lit lit) {
         output << (sign(lit) ? '-' : '+');
         return visit_var(var(lit));
-        return output;
     }
 
     virtual std::ostream &visit_and(ID, IDVector operands) {
@@ -169,14 +169,13 @@ class ExpressionPrinter : public ExpressionVisitor<std::ostream &> {
     virtual std::ostream &visit_false(ID) { return output << "F"; }
     virtual std::ostream &visit_true(ID) { return output << "T"; }
 
-    std::map<uint64, int> *id_to_orig;
+    std::map<uint64_t, int> *id_to_orig;
 
   private:
     std::ostream &output;
     std::ostream &print_vector(IDVector operands) {
         bool first = true;
-        FOR_EACH(i, operands) {
-            const ID n = *i;
+        for (const auto &n : operands) {
             const bool print_parentheses = n.get_type() != LITERAL;
             if (!first)
                 output << " ";
@@ -195,7 +194,7 @@ class NiceExpressionPrinter
     : private ExpressionArgumentVisitor<std::ostream &, size_t> {
   public:
     NiceExpressionPrinter(Expressions &factory,
-                          const unordered_map<int, std::string> &var2name,
+                          const std::unordered_map<int, std::string> &var2name,
                           std::ostream &output)
         : ExpressionArgumentVisitor<std::ostream &, size_t>(factory),
           output(output), var2name(var2name) {}
@@ -265,7 +264,7 @@ class NiceExpressionPrinter
 
   private:
     std::ostream &output;
-    const unordered_map<int, std::string> &var2name;
+    const std::unordered_map<int, std::string> &var2name;
 
     std::ostream &o(size_t offset) {
         while (offset) {
@@ -277,16 +276,15 @@ class NiceExpressionPrinter
     std::ostream &print_vector(IDVector operands, size_t offset) {
         bool first = true;
         bool nl = false;
-        FOR_EACH(i, operands) {
-            const NodeType t = (*i).get_type();
+        for (const auto &i : operands) {
+            const NodeType t = i.get_type();
             if ((t != LITERAL) && (t != TRUE) && (t != FALSE)) {
                 nl = true;
                 break;
             }
         }
 
-        FOR_EACH(i, operands) {
-            const ID n = *i;
+        for (const auto &n : operands) {
             if (nl)
                 output << std::endl;
             if (!first && !nl)
@@ -345,10 +343,10 @@ class NegationPusher : public MemoizedExpressionArgumentVisitor<ID, bool> {
     IDVector ops(IDVector es, bool n, NodeType op) {
         bool changed = false;
         assert(op == AND || op == OR);
-        vector<ID> d;
-        FOR_EACH(i, es) {
-            const ID nv = visit(*i, n);
-            changed |= nv != *i;
+        std::vector<ID> d;
+        for (const auto &o : es) {
+            const ID nv = visit(o, n);
+            changed |= nv != o;
             changed |= factory.add_operand(d, nv, op);
         }
         return changed ? IDVector(d) : es;
@@ -356,4 +354,3 @@ class NegationPusher : public MemoizedExpressionArgumentVisitor<ID, bool> {
 };
 
 } // namespace qesto
-#endif /* VISITORS_H_18486 */

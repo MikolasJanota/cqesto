@@ -5,10 +5,10 @@
  * Copyright (C) 2015, Mikolas Janota
  */
 #include "CLI11.hpp"
-#include "Expressions.h"
-#include "VariableManager.h"
-#include "Visitors.h"
-#include "ZigZag.h"
+#include "expressions.h"
+#include "variable_manager.h"
+#include "visitor.h"
+#include "zigzag.h"
 #include "defs.h"
 #include "options.h"
 #include "qesto_qcir_parser.h"
@@ -92,6 +92,8 @@ int main(int argc, char **argv) {
     qesto::Expressions factory(options);
     StreamBuffer buf(in);
     qesto::QestoQCIRParser parser(buf, factory);
+    if (options.file_name != "-")
+        parser.d_filename = options.file_name;
     parser.parse();
 
     for (auto i : parser.name2var())

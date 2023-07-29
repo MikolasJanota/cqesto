@@ -5,14 +5,14 @@
  * Copyright (C) 2023, Mikolas Janota
  */
 #pragma once
-#include "DataStructures.h"
-#include "Expressions.h"
-#include "IDVector.h"
-#include "VariableManager.h"
-#include "Visitors.h"
 #include "auxiliary.h"
+#include "data_structures.h"
+#include "expressions.h"
+#include "idvector.h"
 #include "qcir_parser.h"
 #include "qtypes.h"
+#include "variable_manager.h"
+#include "visitor.h"
 #include <unordered_map>
 namespace qesto {
 class QestoQCIRParser : public QCIRParser {
@@ -48,6 +48,7 @@ class QestoQCIRParser : public QCIRParser {
 
     virtual void cb_gate_closed() override {
         define_gate(d_gate_var, make_gate());
+        d_qcir_ID_stack.clear();
     }
 
     ID make_gate() {
@@ -68,6 +69,8 @@ class QestoQCIRParser : public QCIRParser {
             return f.make_or(f.make_and(args[0], args[1]),
                              f.make_and(f.make_not(args[0]), args[2]));
         }
+        __PL;
+        exit(1);
     }
 
     virtual void cb_quant_closed() override {
@@ -115,7 +118,7 @@ class QestoQCIRParser : public QCIRParser {
             if (vi == d_name2var.end())
                 semantic_error("undefined variable or gate '" + name + "'");
             const Var v = vi->second;
-            const ID retv = d_factory.make_lit(mkLit(v, sign));
+            const ID retv = d_factory.make_lit(SATSPC::mkLit(v, sign));
             return retv;
         }
     }

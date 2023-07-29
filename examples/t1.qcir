@@ -1,4 +1,4 @@
-#QCIR-G14
+#QCIR-14
 #
 #a simple problem Ex1 Ay2. x1 OR x2
 #
@@ -7,6 +7,6 @@ forall(x2)
 # end of prefix
 #
 output(g)
-g=Xor(x1,x2)
+g=xor(x1,x2)
 #
 # end of circuit

@@ -1,11 +1,11 @@
 /*
- * File:  Expressions.cpp
+ * File:  expressions.cpp
  * Author:  mikolas
  * Created on:  Fri, May 15, 2015 6:29:28 PM
  * Copyright (C) 2015, Mikolas Janota
  */
 
-#include "Expressions.h"
+#include "expressions.h"
 using namespace qesto;
 // namespace qesto {
 
@@ -40,7 +40,7 @@ ID Expressions::make_or(IDVector operands) {
         return make_true();
     if (!options.aig)
         return ID(OR, ors.lookup(operands));
-    vector<ID> nops;
+    std::vector<ID> nops;
     nops.reserve(operands.size());
 
     for (const auto &n : operands) {

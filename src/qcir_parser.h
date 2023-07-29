@@ -5,14 +5,16 @@
  * Copyright (C) 2023, Mikolas Janota
  */
 #pragma once
-#include "fmtutils.hh"
+#include "stream_buffer.h"
 #include <algorithm>
 #include <cstddef>
+#include <sstream>
 #include <string>
 class QCIRParser {
   public:
     QCIRParser(StreamBuffer &buf) : d_buf(buf) {}
     void parse();
+    std::string d_filename; // only err reporting
 
   protected:
     size_t d_ln = 1;
@@ -20,10 +22,7 @@ class QCIRParser {
     enum GType { AND, OR, XOR, ITE };
     typedef std::pair<bool, std::string> Lit;
     StreamBuffer &d_buf;
-    bool is_end() {
-        skip();
-        return *d_buf == EOF;
-    }
+    bool is_end() { return next() == EOF; }
     virtual void cb_qblock_quant(QType qt) = 0;
     virtual void cb_qblock_var(std::string v) = 0;
     virtual void cb_gate_stmt_gt(GType gt) = 0;
@@ -44,10 +43,17 @@ class QCIRParser {
     std::string var();
     void lit_list();
     Lit lit();
-    void nl();
-    void skip(bool skipComments = true);
+    void nltoken();
+    void nlchar();
+    int skip();
     void skip_end_of_line();
-    void match_string(const char *s);
+    void match_string(const char *s, bool run_skip = true);
+    void match_char_token(char c);
     void match_char(char c);
+    int next() {
+        skip();
+        return *d_buf;
+    }
     std::ostream &err();
+    std::stringstream d_varbuf;
 };
