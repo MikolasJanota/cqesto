@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
 #else
     cout << "c MINGW version." << endl;
 #endif
-    cout << "c cqesto, v00.0, " << Version::GIT_SHA1 << ", "
+    cout << "c cqesto, v01.0, " << Version::GIT_SHA1 << ", "
          << Version::GIT_DATE << endl;
     cout << "c (C) 2015 Mikolas Janota, mikolas.janota@gmail.com" << endl;
     signal(SIGTERM, SIG_handler);
@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
     CLI::App app("cqesto non-CNF QBF solver.");
     Options options;
     app.add_option("file_name", options.file_name,
-                   "Input file name, use - or empty for stdin.")
+                   "Input file name, use - (dash) or empty for stdin.")
         ->default_val("-");
     app.add_flag("-a, !--no-a", options.aig, "Use only AND gates.")
         ->default_val(false);
