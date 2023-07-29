@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
     for (auto i : parser.name2var())
         var2name[i.second] = i.first;
     qesto::NiceExpressionPrinter *dprn =
-        new qesto::NiceExpressionPrinter(factory, var2name, cerr);
+        new qesto::NiceExpressionPrinter(factory, var2name, cout);
     ps = new qesto::ZigZag(options, factory, parser.formula());
     ps->dprn = dprn;
     const bool r = ps->solve();

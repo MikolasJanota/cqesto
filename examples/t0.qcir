@@ -7,6 +7,6 @@ forall(x2)
 # end of prefix
 #
 output(g)
-g=and(x1,x2)
+g=or(x1,x2)
 #
 # end of circuit

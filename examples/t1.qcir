@@ -1,6 +1,6 @@
 #QCIR-14
 #
-#a simple problem Ex1 Ay2. x1 OR x2
+#a simple problem Ex1 Ay2. x1 XOR x2
 #
 exists(x1)
 forall(x2)

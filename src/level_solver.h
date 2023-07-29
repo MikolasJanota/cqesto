@@ -34,6 +34,8 @@ class LevelSolver {
 
     NiceExpressionPrinter *dprn = nullptr;
 
+    bool getlastSolve() const { return lastSolve; }
+
   private:
     static std::mt19937 rgen;
     const Options &options;
@@ -50,5 +52,6 @@ class LevelSolver {
     std::unordered_map<Lit, ID> cut2id;
     Simplify simpl;
     SetPolarities pol;
+    bool lastSolve;
 };
 } // namespace qesto

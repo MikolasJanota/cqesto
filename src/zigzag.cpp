@@ -6,12 +6,12 @@
  */
 
 #include "zigzag.h"
+#include "auxiliary.h"
 #include "minisat_auxiliary.h"
 using namespace qesto;
 using Minisat::l_False;
 using Minisat::l_True;
 using Minisat::l_Undef;
-using std::min;
 
 void ZigZag::init() {
     solvers.resize(levels.qlev_count() + 1, NULL);
@@ -23,7 +23,7 @@ void ZigZag::init() {
         solvers[ql] = new LevelSolver(options, factory, ql, levels);
         LevelSolver &s = *(solvers[ql]);
         s.dprn = dprn;
-        for (size_t j = 0; j <= min(ql, levels.qlev_count() - 1); ++j) {
+        for (size_t j = 0; j <= std::min(ql, levels.qlev_count() - 1); ++j) {
             for (const auto v : levels.level_vars(j))
                 s.add_var(v, qt == levels.level_type(j)
                                  ? LevelSolver::PLAYER
@@ -69,6 +69,11 @@ void ZigZag::init() {
 
 void ZigZag::randomize() { solvers[0]->randomize(); }
 
+ZigZag::~ZigZag() {
+    for (auto s : solvers)
+        delete s;
+}
+
 bool ZigZag::solve() {
     int curr_restarts = 0;
     lbool status = l_Undef;
@@ -84,6 +89,15 @@ bool ZigZag::solve() {
 #endif
     }
     assert(status != l_Undef);
+    if (solvers.size() > 1 && solvers[0]->getlastSolve()) {
+        std::cout << "v";
+        for (auto v : levels.level_vars(0)) {
+            const bool vv = solvers[0]->val(v) == l_True;
+            const Lit dl = vv ? mkLit(v) : ~mkLit(v);
+            (*dprn) << " " << dl;
+        }
+        std::cout << std::endl;
+    }
     return status == l_True;
 }
 
