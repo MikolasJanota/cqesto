@@ -22,6 +22,7 @@ void ZigZag::init() {
                 : opponent(levels.level_type(levels.qlev_count() - 1));
         solvers[ql] = new LevelSolver(options, factory, ql, levels);
         LevelSolver &s = *(solvers[ql]);
+        s.dprn = dprn;
         for (size_t j = 0; j <= min(ql, levels.qlev_count() - 1); ++j) {
             for (const auto v : levels.level_vars(j))
                 s.add_var(v, qt == levels.level_type(j)

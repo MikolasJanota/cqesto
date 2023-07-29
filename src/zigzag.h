@@ -10,7 +10,6 @@
 #include "level_solver.h"
 #include "qtypes.h"
 namespace qesto {
-extern NiceExpressionPrinter *dprn;
 
 class ZigZag {
   public:
@@ -28,6 +27,8 @@ class ZigZag {
     std::ostream &print_stats(std::ostream &o) {
         return o << "c bt_count:" << conflict_count << std::endl;
     }
+
+    NiceExpressionPrinter *dprn = nullptr;
 
   private:
     lbool solve_(int confl_budget);

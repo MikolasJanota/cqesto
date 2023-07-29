@@ -32,6 +32,8 @@ class LevelSolver {
     const std::unordered_set<Var> &get_dom_vars() const { return dom_vars; }
     void randomize();
 
+    NiceExpressionPrinter *dprn = nullptr;
+
   private:
     static std::mt19937 rgen;
     const Options &options;

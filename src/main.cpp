@@ -6,21 +6,16 @@
  */
 #include "CLI11.hpp"
 #include "expressions.h"
-#include "variable_manager.h"
-#include "visitor.h"
-#include "zigzag.h"
-#include "defs.h"
 #include "options.h"
 #include "qesto_qcir_parser.h"
 #include "qtypes.h"
+#include "variable_manager.h"
 #include "version.h"
+#include "visitor.h"
+#include "zigzag.h"
 #include <signal.h>
 #include <string>
 using namespace std;
-
-namespace qesto {
-NiceExpressionPrinter *dprn;
-}
 
 qesto::ZigZag *ps = NULL;
 static void SIG_handler(int signum);
@@ -98,12 +93,18 @@ int main(int argc, char **argv) {
 
     for (auto i : parser.name2var())
         var2name[i.second] = i.first;
-    qesto::dprn = new qesto::NiceExpressionPrinter(factory, var2name, cerr);
+    qesto::NiceExpressionPrinter *dprn =
+        new qesto::NiceExpressionPrinter(factory, var2name, cerr);
     ps = new qesto::ZigZag(options, factory, parser.formula());
+    ps->dprn = dprn;
     const bool r = ps->solve();
     std::cout << "c solved " << read_cpu_time() << std::endl;
     ps->print_stats(cerr);
     std::cout << "s cnf " << (r ? '1' : '0') << std::endl;
+#ifndef NDEBUG
+    delete ps;
+    delete dprn;
+#endif
     exit(r ? 10 : 20);
     return r ? 10 : 20;
 }

@@ -15,9 +15,6 @@
 #include <random>
 using namespace qesto;
 using SATSPC::l_Undef;
-namespace qesto {
-extern NiceExpressionPrinter *dprn;
-}
 
 std::mt19937 LevelSolver::rgen(1);
 
