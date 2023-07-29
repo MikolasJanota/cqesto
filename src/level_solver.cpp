@@ -74,7 +74,8 @@ bool LevelSolver::solve(const Substitution &assumptions) {
         cut.push(el);
         cut2id[el] = l;
     }
-    return sat.solve(cut);
+    lastSolve = sat.solve(cut);
+    return lastSolve;
 }
 
 int LevelSolver::analyze() {

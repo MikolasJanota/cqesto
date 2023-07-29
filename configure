@@ -10,6 +10,7 @@ usage: configure [-h|--help][-g|--debug][-e|--expert]
 -h | --help    print this command line option summary
 -g | --debug   compile with assertion checking and symbols
 -c | --cadical compile with cadical instead of minisat
+-s | --static compile static
 EOF
 }
 
@@ -24,6 +25,7 @@ die () {
 
 debug=no
 cadical=no
+static=no
 
 while [ $# -gt 0 ]
 do
@@ -31,12 +33,22 @@ do
     -h|--help) usage; exit 0;;
     -g|--debug) debug=yes;;
     -c|--cadical) cadical=yes;;
+    -s|--static) static=yes;;
     *) die "invalid option '$1' (try '-h')";;
   esac
   shift
 done
 
 CMKFLAGS=""
+
+if [ $static = yes ]
+then
+  msg "static compilation"
+  CMKFLAGS="$CMKFLAGS -DSTATIC_BINARY=ON"
+else
+  CMKFLAGS="$CMKFLAGS -DSTATIC_BINARY=OFF"
+fi
+
 
 if [ $cadical = yes ]
 then
@@ -62,6 +74,7 @@ fi
 
 if [ $debug = yes ]
 then
+  msg "debug compilation"
   CMKFLAGS="$CMKFLAGS -DCMAKE_BUILD_TYPE=Debug"
 else
   CMKFLAGS="$CMKFLAGS -DCMAKE_BUILD_TYPE=Release"

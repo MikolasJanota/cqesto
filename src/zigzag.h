@@ -22,6 +22,7 @@ class ZigZag {
         }
         init();
     }
+    virtual ~ZigZag();
 
     bool solve();
     std::ostream &print_stats(std::ostream &o) {

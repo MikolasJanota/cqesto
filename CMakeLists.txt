@@ -1,14 +1,14 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.24)
 project(cqesto)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(Git)
-find_package(ZLIB)
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING
         "Default build type: Release" FORCE)
 endif()
 
 option(USE_CADICAL "Use cadical as the base solver" OFF)
+option(STATIC_BINARY "Compile static" OFF)
 
 # Add sanitizer flags for C++ compiler for "Debug" configuration
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address,undefined,bool")
@@ -79,6 +79,12 @@ else()
   target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC minisat)
 endif()
 
+if (STATIC_BINARY)
+  set(ZLIB_USE_STATIC_LIBS "ON")
+  target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC "-static")
+endif()
+
+find_package(ZLIB)
 target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC ZLIB::ZLIB)
 
 message(STATUS "Build type : ${CMAKE_BUILD_TYPE}")
