@@ -24,11 +24,18 @@ LevelSolver::LevelSolver(
    const Options& options,
    Expressions& factory,
    size_t lev,
+#ifdef USE_SMS
+   configSolver config,
+#endif
    const LevelInfo& levs)
 : options(options)
 ,factory(factory)
 ,lev(lev)
 ,levs(levs)
+//,variable_manager(config.nextFreeVariable-1)
+#ifdef USE_SMS
+,sat(config)
+#endif
 ,enc(factory,sat,variable_manager)
 ,simpl(options,factory,enc)
 ,pol(factory,enc)

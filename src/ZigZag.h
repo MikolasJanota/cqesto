@@ -34,6 +34,7 @@ extern NiceExpressionPrinter* dprn;
       std::ostream& print_stats(std::ostream& o) {
         return o<<"c bt_count:"<<conflict_count<<std::endl;
       }
+      std::vector<LevelSolver*> solvers;
    private:
       lbool solve_(int confl_budget);
       void randomize();
@@ -54,7 +55,6 @@ extern NiceExpressionPrinter* dprn;
       Expressions& factory;
       LevelInfo levels;
       QFla formula;
-      std::vector<LevelSolver*> solvers;
       size_t conflict_count;
       void init();
       int verb;

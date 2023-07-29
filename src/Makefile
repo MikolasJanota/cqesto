@@ -12,6 +12,8 @@ LIBS =
 CXX?=g++
 CC=g++
 
+#DBG=1
+
 ifdef PROF
 	CFLAGS+=-pg
 	LNFLAGS+=-pg
@@ -44,6 +46,7 @@ CFLAGS += -pedantic
 CFLAGS += -MMD
 LIBS += -lz
 CFLAGS += -I./generated
+#STATIC = 1
 
 ifdef STATIC
 	CFLAGS+=-static
@@ -56,7 +59,8 @@ ifdef NON_INCR
 endif
 
 # =================== Decide which sat solver to use
-USE_MINISAT=1 # minisat is the default
+#USE_MINISAT=1 # minisat is the default
+USE_SMS=1 # minisat is the default
 
 CFLAGS+=-I./minisat # we use literals from minisat in any case
 
@@ -75,6 +79,14 @@ ifdef USE_MINISAT
 	MINISAT_LIB=$(MINISAT_DIR)/libminisat.a
 	LIBS+=-lminisat
 	CFLAGS+=-DUSE_MINISAT
+endif
+
+########### SMS
+ifdef USE_SMS
+	LIBD+=-L.
+	LIBS+=-lipasir -lcadical
+	CFLAGS+=-DUSE_SMS
+	CFLAGS+=-I../../sms-cpp-impl/src # SMS headers
 endif
 
 $(info USE_MINISAT : $(USE_MINISAT))
