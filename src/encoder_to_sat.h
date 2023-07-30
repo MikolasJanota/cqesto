@@ -1,6 +1,6 @@
 #pragma once
+#include "auxiliary.h"
 #include "data_structures.h"
-#include "minisat_auxiliary.h"
 #include "minisat_ext.h"
 #include "variable_manager.h"
 #include "visitor.h"
@@ -24,14 +24,21 @@ class EncoderToSAT : private MemoizedExpressionVisitor<Lit> {
 #ifdef USE_MINISAT
     // try to identify variables set to a constant by unit propagation in the
     // sat solver
-    inline lbool get_val(ID n) {
+    inline SATSPC::lbool get_val(ID n) {
         const auto i = get_m().find(n);
         if (i == get_m().end())
-            return Minisat::l_Undef;
+            return SATSPC::l_Undef;
         const Lit l = i->second;
         const Var v = var(l);
         const auto vv = sat_solver.value(v);
-        return sign(l) ? SATSPC::neg(vv) : vv;
+        if (!sign(l))
+            return vv;
+        if (vv == SATSPC::l_False)
+            return SATSPC::l_True;
+        if (vv == SATSPC::l_True)
+            return SATSPC::l_False;
+        assert(vv == Minisat::l_Undef);
+        return Minisat::l_Undef;
     }
 #endif
 
@@ -82,7 +89,8 @@ class EncoderToSAT : private MemoizedExpressionVisitor<Lit> {
         ls[sz] = and_op ? r : ~r;
         for (size_t i = 0; i < sz; ++i) {
             const Lit operand_encoding = visit(operands[i]);
-            ls[(int)i] = and_op ? ~operand_encoding : operand_encoding;
+            ls[static_cast<int>(i)] =
+                and_op ? ~operand_encoding : operand_encoding;
             if (and_op)
                 sat_solver.addClause(operand_encoding, ~r);
             else
@@ -95,7 +103,7 @@ class EncoderToSAT : private MemoizedExpressionVisitor<Lit> {
     Lit new_lit() {
         const Var v = variable_manager.new_var();
         sat_solver.new_variables(v);
-        return mkLit(v);
+        return SATSPC::mkLit(v);
     }
 };
 } // namespace qesto

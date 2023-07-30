@@ -7,11 +7,14 @@
 
 #include "zigzag.h"
 #include "auxiliary.h"
-#include "minisat_auxiliary.h"
+#include "minisat/core/SolverTypes.h"
+#include <vector>
 using namespace qesto;
-using Minisat::l_False;
-using Minisat::l_True;
-using Minisat::l_Undef;
+using SATSPC::l_False;
+using SATSPC::l_True;
+using SATSPC::l_Undef;
+using SATSPC::lbool;
+using SATSPC::mkLit;
 
 void ZigZag::init() {
     solvers.resize(levels.qlev_count() + 1, NULL);
@@ -104,7 +107,7 @@ bool ZigZag::solve() {
 lbool ZigZag::solve_(int confl_budget) {
     size_t lev = 0;
     Substitution vals;
-    vector<Decision> trail;
+    std::vector<Decision> trail;
     while (1) {
         if (confl_budget == 0)
             return l_Undef;

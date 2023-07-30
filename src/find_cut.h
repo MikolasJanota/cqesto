@@ -8,7 +8,6 @@
 #pragma once
 #include "eval.h"
 #include "expressions.h"
-#include "minisat_auxiliary.h"
 #include "visitor.h"
 #include <unordered_map>
 namespace qesto {
@@ -25,34 +24,34 @@ class FindCut : MemoizedExpressionVisitor<bool> {
     }
 
     virtual bool visit_lit(ID node, Lit) {
-        const lbool v = vals(node);
-        if (v != Minisat::l_Undef)
-            cut.insert(v == Minisat::l_True ? node : factory.make_not(node));
+        const SATSPC::lbool v = vals(node);
+        if (v != SATSPC::l_Undef)
+            cut.insert(v == SATSPC::l_True ? node : factory.make_not(node));
         return true;
     }
 
     virtual bool visit_not(ID node, ID operand) {
-        const lbool v = vals(node);
-        if (v != Minisat::l_Undef) {
-            cut.insert(v == Minisat::l_True ? node : factory.make_not(node));
+        const SATSPC::lbool v = vals(node);
+        if (v != SATSPC::l_Undef) {
+            cut.insert(v == SATSPC::l_True ? node : factory.make_not(node));
             return true;
         }
         return visit(operand);
     }
 
     virtual bool visit_or(ID node, IDVector operands) {
-        const lbool v = vals(node);
-        if (v != Minisat::l_Undef) {
-            cut.insert(v == Minisat::l_True ? node : factory.make_not(node));
+        const SATSPC::lbool v = vals(node);
+        if (v != SATSPC::l_Undef) {
+            cut.insert(v == SATSPC::l_True ? node : factory.make_not(node));
             return true;
         }
         return visit_ops(operands);
     }
 
     virtual bool visit_and(ID node, IDVector operands) {
-        const lbool v = vals(node);
-        if (v != Minisat::l_Undef) {
-            cut.insert(v == Minisat::l_True ? node : factory.make_not(node));
+        const SATSPC::lbool v = vals(node);
+        if (v != SATSPC::l_Undef) {
+            cut.insert(v == SATSPC::l_True ? node : factory.make_not(node));
             return true;
         }
         return visit_ops(operands);

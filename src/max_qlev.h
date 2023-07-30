@@ -8,7 +8,6 @@
 #include "eval.h"
 #include "expressions.h"
 #include "level_info.h"
-#include "minisat_auxiliary.h"
 #include "visitor.h"
 #include <unordered_map>
 namespace qesto {

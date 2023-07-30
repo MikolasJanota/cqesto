@@ -11,10 +11,11 @@
 #include "find_cut.h"
 #include "make_possible.h"
 #include "max_qlev.h"
-#include "minisat_auxiliary.h"
 #include <random>
+#include <vector>
 using namespace qesto;
 
+using SATSPC::mkLit;
 std::mt19937 LevelSolver::rgen(1);
 
 LevelSolver::LevelSolver(const Options &options, Expressions &factory,
@@ -94,7 +95,7 @@ int LevelSolver::analyze() {
 ID LevelSolver::learn(const std::unordered_set<Var> &dom,
                       const Substitution &opp) {
     MakePossible mp(factory, dom, opp);
-    vector<ID> ops;
+    std::vector<ID> ops;
     const auto &confl = sat.get_conflict();
     for (int i = 0; i < confl.size(); i++) {
         const auto el = confl[i];

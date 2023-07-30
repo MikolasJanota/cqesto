@@ -8,6 +8,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 option(USE_CADICAL "Use cadical as the base solver" OFF)
+option(USE_CMS "Use cms as the base solver" OFF)
 option(STATIC_BINARY "Compile static" OFF)
 
 # Add sanitizer flags for C++ compiler for "Debug" configuration
@@ -64,6 +65,14 @@ if (USE_CADICAL)
   target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC cadical)
   set_target_properties(cadical PROPERTIES
     IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/contrib/cadical/libcadical.a)
+elseif(USE_CMS)
+  message(STATUS "Using cms")
+  include_directories(contrib/cms/include)
+  add_library(cms STATIC IMPORTED GLOBAL)
+  target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE USE_IPASIR=1)
+  target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC cms)
+  set_target_properties(cms PROPERTIES
+    IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/contrib/cms/lib/libipasircryptominisat5.a)
 else()
   message(STATUS "Using minisat")
   target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE USE_MINISAT=1)

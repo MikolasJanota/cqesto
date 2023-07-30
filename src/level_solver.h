@@ -8,7 +8,6 @@
 #include "encoder_to_sat.h"
 #include "expressions.h"
 #include "level_info.h"
-#include "minisat_auxiliary.h"
 #include "minisat_ext.h"
 #include "set_polarities.h"
 #include "simplify.h"
@@ -25,7 +24,7 @@ class LevelSolver {
     bool solve(const Substitution &assumptions);
     int analyze();
     ID learn(const std::unordered_set<Var> &dom, const Substitution &opp);
-    lbool val(Var v) const {
+    SATSPC::lbool val(Var v) const {
         assert(vars.count(v));
         return sat.get_model_value(v);
     }

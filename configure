@@ -13,6 +13,7 @@ usage: configure [-h|--help][-g|--debug][-e|--expert]
 -s | --static compile static
 EOF
 }
+# -r | --cms compile with cryptominisat (cms) instead of minisat
 
 msg () {
   echo "[configure] $*"
@@ -25,6 +26,7 @@ die () {
 
 debug=no
 cadical=no
+cms=no
 static=no
 
 while [ $# -gt 0 ]
@@ -33,6 +35,7 @@ do
     -h|--help) usage; exit 0;;
     -g|--debug) debug=yes;;
     -c|--cadical) cadical=yes;;
+    # -r|--cms) cms=yes;;
     -s|--static) static=yes;;
     *) die "invalid option '$1' (try '-h')";;
   esac
@@ -49,6 +52,20 @@ else
   CMKFLAGS="$CMKFLAGS -DSTATIC_BINARY=OFF"
 fi
 
+
+if [ $cms = yes ]
+then
+  CMKFLAGS="$CMKFLAGS -DUSE_CMS=ON"
+  if [ -d "contrib/cms" ]; then
+    msg "assuming that cms is already set up"
+  else
+    msg "setting up cms SAT solver"
+    (cd contrib ; ./setup-cms.sh)
+    msg "cms setup done"
+	fi
+else
+  CMKFLAGS="$CMKFLAGS -DUSE_CMS=OFF"
+fi
 
 if [ $cadical = yes ]
 then

@@ -32,7 +32,7 @@ class ZigZag {
     NiceExpressionPrinter *dprn = nullptr;
 
   private:
-    lbool solve_(int confl_budget);
+    SATSPC::lbool solve_(int confl_budget);
     void randomize();
 
     struct Decision {

@@ -2,6 +2,7 @@
 #include "encoder_to_sat.h"
 #include "reduce.h"
 #include "transform.h"
+#include <vector>
 namespace qesto {
 class Simplify : private Transform {
   public:
@@ -12,7 +13,7 @@ class Simplify : private Transform {
 
 #ifdef USE_MINISAT
     virtual ID visit(ID node) override {
-        const lbool nv = enc.get_val(node);
+        const auto nv = enc.get_val(node);
         if (nv == Minisat::l_False)
             return factory.make_false();
         if (nv == Minisat::l_True)
@@ -42,7 +43,7 @@ class Simplify : private Transform {
     ID visit_and_or(ID node, IDVector operands, const NodeType operation) {
         assert(operation == AND || operation == OR);
         bool is_mixed;
-        vector<ID> recursed;
+        std::vector<ID> recursed;
         bool changed;
         changed = recurse(operands, operation, is_mixed, recursed);
         if (!is_mixed) {
@@ -57,7 +58,7 @@ class Simplify : private Transform {
 
         Substitution substitution;
         make_substitution(recursed, operation, substitution);
-        vector<ID> reduced;
+        std::vector<ID> reduced;
         changed |=
             apply_substitution(substitution, recursed, operation, reduced);
         if (changed) {
@@ -75,7 +76,7 @@ class Simplify : private Transform {
     }
 
     bool recurse(const IDVector &operands, const NodeType operation,
-                 bool &is_mixed, vector<ID> &new_operands) {
+                 bool &is_mixed, std::vector<ID> &new_operands) {
         assert(operation == AND || operation == OR);
         bool cx = false;   // there are complex expressions
         bool lits = false; // there are literals
@@ -94,7 +95,8 @@ class Simplify : private Transform {
         return changed;
     }
 
-    void make_substitution(const vector<ID> &operands, const NodeType operation,
+    void make_substitution(const std::vector<ID> &operands,
+                           const NodeType operation,
                            Substitution &substitution) {
         assert(operation == AND || operation == OR);
         const bool negate = operation == OR;
@@ -108,9 +110,9 @@ class Simplify : private Transform {
     }
 
     bool apply_substitution(const Substitution &substitution,
-                            const vector<ID> &operands,
+                            const std::vector<ID> &operands,
                             const NodeType operation,
-                            vector<ID> &new_operands) {
+                            std::vector<ID> &new_operands) {
         Reduce reduce(factory, substitution);
         bool changed = false;
 
