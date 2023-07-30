@@ -3,8 +3,8 @@ A circuit-based QBF solver. The underlying algorithm is explained in [1].  It
 is a continuation of the  clause-selection algorithm [2].
 
 # Building
-
 Run
+
      ./configure [OPTIONS] && cd build && make
 
 See `./configure -h` for configurations.
