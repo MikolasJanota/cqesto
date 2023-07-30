@@ -36,10 +36,9 @@ class ID {
     ID() : index(-1), type(OR) {}
     inline NodeType get_type() const { return type; }
     inline size_t get_index() const { return index; }
-    inline uint64_t toInt() const {
+    inline uint64_t toInt() const { // careful with precedence of "<<"!
         return (((uint64_t)type) << 32) + index;
-    } // Be careful of precedence of "<<"!
-    inline static uint64_t toInt(ID id) { return id.toInt(); }
+    }
     static ID fromInt(uint64_t i) { return ID(i); }
 
   private:

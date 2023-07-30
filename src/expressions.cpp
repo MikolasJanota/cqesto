@@ -14,13 +14,13 @@ ID Expressions::make_false() { return ID(FALSE, 0); }
 ID Expressions::make_true() { return ID(TRUE, 0); }
 
 ID Expressions::make_lit(Lit l) {
-    const int val = SATSPC::toInt(l);
+    const auto val = SATSPC::toInt(l);
     assert(val >= 0);
-    return ID(LITERAL, (size_t)val);
+    return ID(LITERAL, static_cast<size_t>(val));
 }
 
 ID Expressions::make_and(IDVector operands) {
-    const size_t sz = operands.size();
+    const auto sz = operands.size();
     if (sz == 0)
         return make_true();
     if (sz == 1)
@@ -31,7 +31,7 @@ ID Expressions::make_and(IDVector operands) {
 }
 
 ID Expressions::make_or(IDVector operands) {
-    const size_t sz = operands.size();
+    const auto sz = operands.size();
     if (sz == 0)
         return make_false();
     if (sz == 1)
@@ -40,17 +40,17 @@ ID Expressions::make_or(IDVector operands) {
         return make_true();
     if (!options.aig)
         return ID(OR, ors.lookup(operands));
-    std::vector<ID> nops;
-    nops.reserve(operands.size());
+    std::vector<ID> new_ops;
+    new_ops.reserve(operands.size());
 
     for (const auto &n : operands) {
         if (n.get_type() == FALSE)
             continue;
         if (n.get_type() == TRUE)
             return make_true();
-        nops.push_back(make_not(n));
+        new_ops.push_back(make_not(n));
     }
-    return make_not(ID(AND, ands.lookup(IDVector(nops))));
+    return make_not(ID(AND, ands.lookup(IDVector(new_ops))));
 }
 
 ID Expressions::make_not(ID operand) {

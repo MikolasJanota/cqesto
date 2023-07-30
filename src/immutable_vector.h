@@ -5,10 +5,11 @@
  * Copyright (C) 2015, Mikolas Janota
  */
 #pragma once
+#include <algorithm>
 #include <cassert>
 #include <iostream>
-#include <vector> // for vector
-#include <algorithm>
+#include <utility>
+#include <vector>
 namespace qesto {
 template <class T, class HashFun> class const_ImmutableVectorIterator;
 template <class T, class HashFun> class ImmutableVector {
@@ -32,6 +33,11 @@ template <class T, class HashFun> class ImmutableVector {
         if (_data != nullptr)
             ++(_data->count);
     }
+
+    inline ImmutableVector(ImmutableVector<T, HashFun> &&o)
+        : _hash_code(std::exchange(o._hash_code, -1)),
+          _size(std::exchange(o._size, -1)),
+          _data(std::exchange(o._data, nullptr)) {}
 
     ImmutableVector<T, HashFun> &
     operator=(const ImmutableVector<T, HashFun> &ls) {
@@ -77,7 +83,7 @@ template <class T, class HashFun> class ImmutableVector {
         size_t count;
         T *elements;
     };
-    static const size_t EMPTY_HASH = 3889;
+    static const size_t EMPTY_HASH = 3217;
     size_t _hash_code;
     size_t _size;
     Data *_data;
@@ -101,13 +107,12 @@ inline size_t ImmutableVector<T, HashFun>::decrease() {
 template <class T, class HashFun>
 bool ImmutableVector<T, HashFun>::equals(
     const ImmutableVector<T, HashFun> &other) const {
-    if (other._size != _size) {
+    if (other._size != _size)
         return false;
-    }
     if (other._data == _data)
         return true;
 
-    for (size_t i = 0; i < _size; ++i)
+    for (size_t i = _size; i--;)
         if (_data->elements[i] != other._data->elements[i])
             return false;
     return true;
@@ -169,8 +174,7 @@ ImmutableVector<T, HashFun>::ImmutableVector(const std::vector<T> &es) {
     T *const elements = _data->elements;
     for (size_t i = 0; i < vsz; ++i)
         elements[i] = es[i];
-    /* SATSPC::sort(elements, vsz, SATSPC::LessThan_default<T>()); */
-    std::sort(elements, elements+vsz);
+    std::sort(elements, elements + vsz);
     _size = vsz;
     size_t j = 1;
     T last = elements[0];

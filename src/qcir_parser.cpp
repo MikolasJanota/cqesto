@@ -23,7 +23,24 @@ void QCIRParser::qcir_file() {
 }
 
 void QCIRParser::format_id() {
-    match_string("#QCIR-14", false);
+    bool found = false;
+    // even though it's not permitted in the format, try to avoid comments
+    // before the header
+    while (!found) {
+        match_char('#');
+        if (*d_buf == 'Q') {
+            match_string("qcir-", false);
+            if (*d_buf == 'g' or *d_buf == 'G')
+                ++d_buf;
+            match_string("14", false);
+            found = true;
+        } else {
+            while (*d_buf != '\n' && *d_buf != '\r' && *d_buf != EOF)
+                ++d_buf;
+            if (*d_buf != EOF)
+                nlchar();
+        }
+    }
     nltoken();
 }
 
@@ -40,18 +57,22 @@ void QCIRParser::gate_stmt() {
     match_char_token('=');
     switch (next()) {
     case 'a':
+    case 'A':
         match_string("and");
         cb_gate_stmt_gt(GType::AND);
         break;
     case 'o':
+    case 'O':
         match_string("or");
         cb_gate_stmt_gt(GType::OR);
         break;
     case 'x':
+    case 'X':
         match_string("xor");
         cb_gate_stmt_gt(GType::XOR);
         break;
     case 'i':
+    case 'I':
         match_string("ite");
         cb_gate_stmt_gt(GType::ITE);
         break;
@@ -142,7 +163,9 @@ void QCIRParser::match_string(const char *s, bool run_skip) {
                   << std::endl;
             exit(1);
         }
-        const char rc = *d_buf;
+        char rc = *d_buf;
+        if ('A' <= rc && rc <= 'Z')
+            rc = (rc - 'A') + 'a';
         if (rc != *s) {
             err() << "Unexpected character '" << rc << "' when looking for '"
                   << *s << "' in " << olds << "'." << std::endl;

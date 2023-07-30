@@ -11,7 +11,6 @@ namespace qesto {
 class IDVector : public ImmutableVector<ID, ID_hash> {
   public:
     using ImmutableVector::ImmutableVector; // inherit constructors
-    virtual ~IDVector() {}
 
     inline bool contains_true() { return first(TRUE) < size(); }
     inline bool contains_false() { return first(FALSE) < size(); }

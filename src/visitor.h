@@ -16,8 +16,8 @@ template <class R> class ExpressionVisitor {
     virtual R visit(ID expression) {
         switch (expression.get_type()) {
         case LITERAL:
-            return visit_lit(expression,
-                             SATSPC::toLit((int)expression.get_index()));
+            return visit_lit(expression, SATSPC::toLit(static_cast<int>(
+                                             expression.get_index())));
         case NEGATION:
             return visit_not(expression, factory.open_not(expression));
         case AND: return visit_and(expression, factory.open_and(expression));
@@ -62,7 +62,7 @@ template <class R, class A> class ExpressionArgumentVisitor {
         case FALSE: return visit_false(expression, argument);
         case TRUE: return visit_true(expression, argument);
         }
-        std::cerr << "ERR: " << expression.get_type() << std::endl;
+        std::cerr << "FATAL ERROR: " << expression.get_type() << std::endl;
         assert(0);
         abort();
     }
@@ -135,7 +135,7 @@ class ExpressionPrinter : public ExpressionVisitor<std::ostream &> {
 
     virtual std::ostream &visit_var(Var v) {
         if (id_to_orig) {
-            ID id = ID(LITERAL, SATSPC::toInt(SATSPC::mkLit(v)));
+            ID id = factory.make_lit(SATSPC::mkLit(v));
             int orig = (*id_to_orig)[id.toInt()];
             return output << orig;
         } else {
