@@ -13,7 +13,6 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#define SATSPC Minisat
 namespace SATSPC {
 std::ostream &operator<<(std::ostream &outs, Lit lit);
 class MiniSatExt {

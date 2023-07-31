@@ -3,14 +3,22 @@
 #define LEVELINFO
 #include "data_structures.h"
 #include "qtypes.h"
+#include <type_traits>
 namespace qesto {
 class LevelInfo {
   public:
     LevelInfo(const Prefix &pref);
 
-    inline size_t qlev(Var v) const {
+    size_t ix(Var v) const {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wtype-limits"
         assert(v >= 0);
-        const auto vi = (size_t)v;
+        return static_cast<size_t>(v);
+#pragma GCC diagnostic pop
+    }
+
+    inline size_t qlev(Var v) const {
+        const auto vi = ix(v);
         assert(vi < vis.size());
         return vis[vi].second;
     }
@@ -18,8 +26,7 @@ class LevelInfo {
     inline size_t qlev(Lit l) const { return qlev(var(l)); }
 
     inline QuantifierType type(Var v) const {
-        assert(v >= 0);
-        const auto vi = (size_t)v;
+        const auto vi = ix(v);
         assert(vi < vis.size());
         return vis[vi].first;
     }

@@ -13,11 +13,7 @@ ID Expressions::make_false() { return ID(FALSE, 0); }
 
 ID Expressions::make_true() { return ID(TRUE, 0); }
 
-ID Expressions::make_lit(Lit l) {
-    const auto val = SATSPC::toInt(l);
-    assert(val >= 0);
-    return ID(LITERAL, static_cast<size_t>(val));
-}
+ID Expressions::make_lit(Lit l) { return ID::mkLit(l); }
 
 ID Expressions::make_and(IDVector operands) {
     const auto sz = operands.size();

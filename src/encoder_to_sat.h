@@ -7,7 +7,7 @@
 namespace qesto {
 class EncoderToSAT : private MemoizedExpressionVisitor<Lit> {
   public:
-    EncoderToSAT(Expressions &factory, SATSPC::MiniSatExt &sat_solver,
+    EncoderToSAT(Expressions &factory, SATSOLVER &sat_solver,
                  const VariableManager &variable_manager)
         : MemoizedExpressionVisitor<Lit>(factory), sat_solver(sat_solver),
           variable_manager(variable_manager) {}
@@ -78,24 +78,25 @@ class EncoderToSAT : private MemoizedExpressionVisitor<Lit> {
     }
 
   private:
-    SATSPC::MiniSatExt &sat_solver;
+    SATSOLVER &sat_solver;
     VariableManager variable_manager;
 
   private:
     Lit encode_ops(const IDVector &operands, bool and_op) {
         const Lit r = new_lit();
-        const size_t sz = operands.size();
-        SATSPC::vec<Lit> ls(sz + 1);
-        ls[sz] = and_op ? r : ~r;
-        for (size_t i = 0; i < sz; ++i) {
-            const Lit operand_encoding = visit(operands[i]);
-            ls[static_cast<int>(i)] =
-                and_op ? ~operand_encoding : operand_encoding;
-            if (and_op)
+        SATCLS ls;
+        SATCLS_CAPACITY(ls, operands.size() + 1);
+        for (const auto &op : operands) {
+            const Lit operand_encoding = visit(op);
+            if (and_op) {
+                SATCLS_PUSH(ls, ~operand_encoding);
                 sat_solver.addClause(operand_encoding, ~r);
-            else
+            } else {
+                SATCLS_PUSH(ls, operand_encoding);
                 sat_solver.addClause(~operand_encoding, r);
+            }
         }
+        SATCLS_PUSH(ls, and_op ? r : ~r);
         sat_solver.addClause_(ls);
         return r;
     }

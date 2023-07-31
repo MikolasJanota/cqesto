@@ -37,6 +37,9 @@ int main(int argc, char **argv) {
 #ifdef USE_MINISAT
     cout << "c solver MINISAT" << endl;
 #endif /*USE_MINISAT*/
+#ifdef USE_CMS
+    cout << "c solver cryptominisat5" << endl;
+#endif /*USE_IPASIR*/
 
 #ifndef __MINGW32__
     signal(SIGHUP, SIG_handler);

@@ -58,7 +58,7 @@ class Expressions {
 
     inline Lit open_lit(ID node) const {
         assert(node.get_type() == LITERAL);
-        return SATSPC::toLit(static_cast<int>(node.get_index()));
+        return ID::getLit(node);
     }
 
     inline bool is_complement_lit(ID o1, ID o2) {

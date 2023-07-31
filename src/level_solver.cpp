@@ -26,9 +26,6 @@ LevelSolver::LevelSolver(const Options &options, Expressions &factory,
 
 void LevelSolver::add_var(Var v, VarType vt) {
     assert(constrs.empty());
-    while (variable_manager.max() < v)
-        variable_manager.new_var();
-    sat.new_variables(v);
     enc.alloc(v);
     insert_chk(vars, v);
     if (vt != AUX)
@@ -66,15 +63,17 @@ bool LevelSolver::solve(const Substitution &assumptions) {
     FindCut fc(factory, ev);
     for (const auto &i : constrs)
         fc(i);
-    SATSPC::vec<Lit> cut;
+    const auto &cut = fc.get_cut();
+    SATCLS cut_clause;
+    SATCLS_CAPACITY(cut_clause, cut.size());
     cut2id.clear();
     for (const auto &l : fc.get_cut()) {
         assert(ev(l) != SATSPC::l_Undef);
         const auto el = enc(l);
-        cut.push(el);
+        SATCLS_PUSH(cut_clause, el);
         cut2id[el] = l;
     }
-    lastSolve = sat.solve(cut);
+    lastSolve = sat.solve(cut_clause);
     return lastSolve;
 }
 
@@ -82,7 +81,7 @@ int LevelSolver::analyze() {
     MaxQLev mql(factory, plvars, levs);
     int bt = -1;
     const auto &confl = sat.get_conflict();
-    for (int i = 0; i < confl.size(); i++) {
+    for (auto i = confl.size(); i--;) {
         const auto el = confl[i];
         const auto j = cut2id.find(~el);
         assert(j != cut2id.end());
@@ -97,7 +96,7 @@ ID LevelSolver::learn(const std::unordered_set<Var> &dom,
     MakePossible mp(factory, dom, opp);
     std::vector<ID> ops;
     const auto &confl = sat.get_conflict();
-    for (int i = 0; i < confl.size(); i++) {
+    for (auto i = confl.size(); i--;) {
         const auto el = confl[i];
         const auto j = cut2id.find(~el);
         assert(j != cut2id.end());

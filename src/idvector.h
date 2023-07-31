@@ -26,8 +26,8 @@ class IDVector : public ImmutableVector<ID, ID_hash> {
             const ID &c = (*this)[i];
             if (c.get_type() != LITERAL)
                 return false;
-            const Lit clit = SATSPC::toLit((int)c.get_index());
-            const Lit lastlit = SATSPC::toLit((int)last.get_index());
+            const Lit clit = ID::getLit(c);
+            const Lit lastlit = ID::getLit(last);
             if (lastlit == ~clit)
                 return true;
             last = c;

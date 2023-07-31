@@ -10,10 +10,10 @@ usage: configure [-h|--help][-g|--debug][-e|--expert]
 -h | --help    print this command line option summary
 -g | --debug   compile with assertion checking and symbols
 -c | --cadical compile with cadical instead of minisat
+-r | --cms compile with cryptominisat (cms) instead of minisat
 -s | --static compile static
 EOF
 }
-# -r | --cms compile with cryptominisat (cms) instead of minisat
 
 msg () {
   echo "[configure] $*"
@@ -35,7 +35,7 @@ do
     -h|--help) usage; exit 0;;
     -g|--debug) debug=yes;;
     -c|--cadical) cadical=yes;;
-    # -r|--cms) cms=yes;;
+    -r|--cms) cms=yes;;
     -s|--static) static=yes;;
     *) die "invalid option '$1' (try '-h')";;
   esac

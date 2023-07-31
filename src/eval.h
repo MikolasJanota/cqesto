@@ -7,61 +7,61 @@
 
 #pragma once
 #include "expressions.h"
-#include "minisat/core/SolverTypes.h"
+#include "minisat_ext.h"
 #include "visitor.h"
 #include <unordered_map>
 namespace qesto {
-class Eval : MemoizedExpressionVisitor<Minisat::lbool> {
+class Eval : MemoizedExpressionVisitor<SATSPC::lbool> {
   public:
     Eval(Expressions &factory, const Substitution &vals)
-        : MemoizedExpressionVisitor<Minisat::lbool>(factory), vals(vals) {}
+        : MemoizedExpressionVisitor<SATSPC::lbool>(factory), vals(vals) {}
 
-    Minisat::lbool operator()(ID n) { return visit(n); }
+    SATSPC::lbool operator()(ID n) { return visit(n); }
 
-    virtual Minisat::lbool visit_lit(ID, Lit lit) {
+    virtual SATSPC::lbool visit_lit(ID, Lit lit) {
         const auto i = vals.find(var(lit));
         if (i == vals.end())
-            return Minisat::l_Undef;
-        return Minisat::sign(lit) != i->second ? Minisat::l_True
-                                               : Minisat::l_False;
+            return SATSPC::l_Undef;
+        return SATSPC::sign(lit) != i->second ? SATSPC::l_True
+                                              : SATSPC::l_False;
     }
 
-    virtual Minisat::lbool visit_and(ID, IDVector operands) {
+    virtual SATSPC::lbool visit_and(ID, IDVector operands) {
         bool allt = true;
         for (const auto &i : operands) {
-            const Minisat::lbool ri = visit(i);
-            if (ri == Minisat::l_False)
-                return Minisat::l_False;
-            if (ri == Minisat::l_Undef)
+            const SATSPC::lbool ri = visit(i);
+            if (ri == SATSPC::l_False)
+                return SATSPC::l_False;
+            if (ri == SATSPC::l_Undef)
                 allt = false;
         }
-        return allt ? Minisat::l_True : Minisat::l_Undef;
+        return allt ? SATSPC::l_True : SATSPC::l_Undef;
     }
 
-    virtual Minisat::lbool visit_not(ID, ID operand) {
+    virtual SATSPC::lbool visit_not(ID, ID operand) {
         const auto v = visit(operand);
-        if (v == Minisat::l_False)
-            return Minisat::l_True;
-        if (v == Minisat::l_True)
-            return Minisat::l_False;
-        assert(v == Minisat::l_Undef);
-        return Minisat::l_Undef;
+        if (v == SATSPC::l_False)
+            return SATSPC::l_True;
+        if (v == SATSPC::l_True)
+            return SATSPC::l_False;
+        assert(v == SATSPC::l_Undef);
+        return SATSPC::l_Undef;
     }
 
-    virtual Minisat::lbool visit_or(ID, IDVector operands) {
+    virtual SATSPC::lbool visit_or(ID, IDVector operands) {
         bool allf = true;
         for (const auto &i : operands) {
-            const Minisat::lbool ri = visit(i);
-            if (ri == Minisat::l_True)
-                return Minisat::l_True;
-            if (ri == Minisat::l_Undef)
+            const SATSPC::lbool ri = visit(i);
+            if (ri == SATSPC::l_True)
+                return SATSPC::l_True;
+            if (ri == SATSPC::l_Undef)
                 allf = false;
         }
-        return allf ? Minisat::l_False : Minisat::l_Undef;
+        return allf ? SATSPC::l_False : SATSPC::l_Undef;
     }
 
-    virtual Minisat::lbool visit_false(ID) { return Minisat::l_False; }
-    virtual Minisat::lbool visit_true(ID) { return Minisat::l_True; }
+    virtual SATSPC::lbool visit_false(ID) { return SATSPC::l_False; }
+    virtual SATSPC::lbool visit_true(ID) { return SATSPC::l_True; }
 
   private:
     const Substitution &vals;

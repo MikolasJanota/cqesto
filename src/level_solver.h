@@ -46,7 +46,7 @@ class LevelSolver {
     std::unordered_set<Var> plvars;
     std::vector<ID> constrs;
     VariableManager variable_manager;
-    SATSPC::MiniSatExt sat;
+    SATSOLVER sat;
     EncoderToSAT enc;
     std::unordered_map<Lit, ID> cut2id;
     Simplify simpl;

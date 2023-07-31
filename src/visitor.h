@@ -16,8 +16,7 @@ template <class R> class ExpressionVisitor {
     virtual R visit(ID expression) {
         switch (expression.get_type()) {
         case LITERAL:
-            return visit_lit(expression, SATSPC::toLit(static_cast<int>(
-                                             expression.get_index())));
+            return visit_lit(expression, factory.open_lit(expression));
         case NEGATION:
             return visit_not(expression, factory.open_not(expression));
         case AND: return visit_and(expression, factory.open_and(expression));
@@ -50,7 +49,7 @@ template <class R, class A> class ExpressionArgumentVisitor {
         switch (expression.get_type()) {
         case LITERAL:
             return visit_lit(expression, argument,
-                             SATSPC::toLit((int)expression.get_index()));
+                             factory.open_lit(expression));
         case NEGATION:
             return visit_not(expression, argument,
                              factory.open_not(expression));

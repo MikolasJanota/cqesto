@@ -16,8 +16,7 @@
 #include <assert.h>
 #include <string.h>
 
-#define __PL   (std::cerr << __FILE__ << ":" << __LINE__ << std::endl).flush();
-#define SATSPC Minisat
+#define __PL (std::cerr << __FILE__ << ":" << __LINE__ << std::endl).flush();
 
 #ifdef __MINGW32__
 static inline double read_cpu_time() { return 0; }

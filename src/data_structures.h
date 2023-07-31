@@ -40,6 +40,18 @@ class ID {
         return (((uint64_t)type) << 32) + index;
     }
     static ID fromInt(uint64_t i) { return ID(i); }
+#if USE_CMS
+    static ID mkLit(const Lit &l) {
+        return ID(LITERAL, static_cast<size_t>(l.toInt()));
+    }
+    static Lit getLit(const ID &l) { return CMSat::Lit::toLit(l.index); }
+#else
+    static Lit getLit(const ID &l) { return SATSPC::toLit(l.index); }
+
+    static ID mkLit(const Lit &l) {
+        return ID(LITERAL, static_cast<size_t>(SATSPC::toInt(l)));
+    }
+#endif
 
   private:
     ID(uint64_t i) : index(i & 0xFFFFFFFF), type((NodeType)(i >> 32)) {
@@ -106,8 +118,16 @@ template <> struct hash<pair<qesto::ID, bool>> {
     }
 };
 
+#if USE_CMS
 template <> struct hash<SATSPC::Lit> {
-    inline size_t operator()(SATSPC::Lit l) const { return SATSPC::toInt(l); }
+    inline size_t operator()(const SATSPC::Lit &l) const { return l.toInt(); }
 };
+#else
+template <> struct hash<SATSPC::Lit> {
+    inline size_t operator()(const SATSPC::Lit &l) const {
+        return SATSPC::toInt(l);
+    }
+};
+#endif
 } // namespace std
 
