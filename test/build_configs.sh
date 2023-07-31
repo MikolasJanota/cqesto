@@ -16,9 +16,9 @@ for g in '-g' '' ; do
               continue
             fi
             echo '===== Trying' ${sat} ${g} ${s}
-            # oname=${program_name}_${sat}
-            # if [[ ! -z "${s}" ]]; then oname=${oname}'_static'; fi
-            # if [[ ! -z "${g}" ]]; then oname=${oname}'_dbg'; fi
+            oname=${program_name}_${sat}
+            if [[ ! -z "${s}" ]]; then oname=${oname}'_static'; fi
+            if [[ ! -z "${g}" ]]; then oname=${oname}'_dbg'; fi
             ./configure $g $s $sat 
             cd build
             make -j 4
@@ -26,8 +26,8 @@ for g in '-g' '' ; do
             then
                 echo "===== Compiled: ${oname}"
             fi
-            rm -fv ${program_name}
             cd ..
+            mv -v build $oname
         done
     done
 done

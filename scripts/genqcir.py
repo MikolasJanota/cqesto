@@ -38,8 +38,15 @@ def gn(free, used, mxd) :
     global MXDEPTH,MNDEPTH,defs
     if not free:
         return make_false()
-    ntype=random.randint(1 if mxd<MNDEPTH else 0, NT_CNT-1)
-    if mxd==MXDEPTH or ntype==LITERAL:
+    if mxd < MNDEPTH:
+        # ntypes = [AND,OR,XOR,ITE]
+        ntypes = [AND,OR]
+        if mxd >= MNDEPTH:
+            ntypes.append(LITERAL)
+    else:
+        ntypes = [LITERAL]
+    ntype = random.choice(ntypes)
+    if ntype==LITERAL:
         return mkLit(free, used)
     arg_count = {AND:3,OR:3,XOR:2,ITE:3}[ntype]
     name={AND:'and',OR:'or',XOR:'xor',ITE:'ite'}[ntype]
@@ -55,6 +62,7 @@ def main():
     if len(sys.argv)!=5:
         print('Unexpected number of options!')
         print('USAGE: number-of-input-variables qlevs minimum-depth maximum-depth')
+        sys.exit(100)
     N, MAXQLEV, MNDEPTH, MXDEPTH = map(int, sys.argv[1:5])
     if MNDEPTH > MXDEPTH:
         sys.exit(100)
