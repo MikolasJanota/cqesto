@@ -140,7 +140,7 @@ lbool ZigZag::solve_(int confl_budget) {
                 std::cerr << "bt:" << bt << std::endl;
             if (bt < 0)
                 return qt == UNIVERSAL ? l_True : l_False;
-            const size_t btx = (size_t)bt;
+            const auto btx = static_cast<size_t>(bt);
             Substitution opp;
             while (trail.size()) {
                 const auto &d = trail.back();
