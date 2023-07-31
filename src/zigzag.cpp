@@ -92,14 +92,14 @@ bool ZigZag::solve() {
 #endif
     }
     assert(status != l_Undef);
-    if (solvers.size() > 1 && solvers[0]->getlastSolve()) {
+    if (dprn && solvers.size() > 1 && solvers[0]->get_last_solve()) {
         std::cout << "v";
         for (auto v : levels.level_vars(0)) {
             const bool vv = solvers[0]->val(v) == l_True;
             const Lit dl = vv ? mkLit(v) : ~mkLit(v);
             (*dprn) << " " << dl;
         }
-        std::cout << std::endl;
+        std::cout << " 0" << std::endl;
     }
     return status == l_True;
 }

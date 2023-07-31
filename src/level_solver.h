@@ -33,7 +33,7 @@ class LevelSolver {
 
     NiceExpressionPrinter *dprn = nullptr;
 
-    bool getlastSolve() const { return lastSolve; }
+    bool get_last_solve() const { return lastSolve; }
 
   private:
     static std::mt19937 rgen;

@@ -56,6 +56,14 @@ list(APPEND CPPSOURCES "${CMAKE_CURRENT_BINARY_DIR}/version.cpp")
  
 add_executable(${CMAKE_PROJECT_NAME} ${CPPSOURCES} ${CSOURCES})
 
+if (STATIC_BINARY)
+  set(ZLIB_USE_STATIC_LIBS "ON")
+  target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC "-static")
+endif()
+
+find_package(ZLIB)
+target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC ZLIB::ZLIB)
+
 if (USE_CADICAL)
   # even though we are not using minisat, we use its literals to communicate it with ipasir
   include_directories(contrib/minisat/include) 
@@ -97,13 +105,6 @@ else()
   target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC minisat)
 endif()
 
-if (STATIC_BINARY)
-  set(ZLIB_USE_STATIC_LIBS "ON")
-  target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC "-static")
-endif()
-
-find_package(ZLIB)
-target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC ZLIB::ZLIB)
 
 message(STATUS "Build type : ${CMAKE_BUILD_TYPE}")
 message(STATUS "CXXFLAGS   : ${CMAKE_CXX_FLAGS}")
