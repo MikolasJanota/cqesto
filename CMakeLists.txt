@@ -76,6 +76,8 @@ if (USE_CADICAL)
     )
   if(NOT CADICAL_LIBRARY)
     message(FATAL_ERROR "CADICAL library not found")
+  else()
+    message(STATUS "Found ${CADICAL_LIBRARY}")
   endif()
   add_library(cadical STATIC IMPORTED GLOBAL)
   set_target_properties(cadical PROPERTIES IMPORTED_LOCATION ${CADICAL_LIBRARY})
@@ -98,6 +100,8 @@ elseif(USE_CMS)
   endif()
   if(NOT CMS_LIBRARY)
     message(FATAL_ERROR "CMS library not found")
+  else()
+    message(STATUS "Found ${CMS_LIBRARY}")
   endif()
   if (STATIC_BINARY)
     add_library(cms STATIC IMPORTED GLOBAL)
@@ -114,6 +118,10 @@ else()
   include_directories(contrib/minisat/include)
   message(STATUS "Using minisat")
 
+  # find_library(MINISAT_LIBRARY
+  #   NAMES libminisat.a minisat
+  #   HINTS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/minisat/lib"
+  #   )
   if (STATIC_BINARY)
     find_library(MINISAT_LIBRARY
       NAMES libminisat.a minisat
@@ -128,16 +136,18 @@ else()
 
   if(NOT MINISAT_LIBRARY)
     message(FATAL_ERROR "MINISAT library not found")
+  else()
+    message(STATUS "Found ${MINISAT_LIBRARY}")
   endif()
+
+  # add_library(minisat STATIC IMPORTED GLOBAL)
 
   if (STATIC_BINARY)
-    add_library(cms STATIC IMPORTED GLOBAL)
+    add_library(minisat STATIC IMPORTED GLOBAL)
   else()
-    add_library(cms SHARED IMPORTED GLOBAL)
+    add_library(minisat SHARED IMPORTED GLOBAL)
   endif()
 
-
-  add_library(minisat STATIC IMPORTED GLOBAL)
   set_target_properties(minisat PROPERTIES IMPORTED_LOCATION ${MINISAT_LIBRARY})
 
   target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE USE_MINISAT=1)

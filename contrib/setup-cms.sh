@@ -7,21 +7,62 @@
 #
 
 set -e
-mkdir cms
-cd cms
+static=no
+
+usage () {
+cat <<EOF
+usage: $0 [-h|--help][-s|--static]
+
+-h | --help    print this command line option summary
+-s | --static compile static
+EOF
+}
+
+msg () {
+  echo "[setup-cms] $*"
+}
+
+while [ $# -gt 0 ]
+do
+  case $1 in
+    -h|--help) usage; exit 0;;
+    -s|--static) static=yes;;
+    *) die "invalid option '$1' (try '-h')";;
+  esac
+  shift
+done
+
+CMSFLAGS="-DONLY_SIMPLE=ON -DNOZLIB=ON -DSTATS=OFF -DNOVALGRIND=ON -DENABLE_TESTING=OFF"
+
+CONTRIB_ROOT=`pwd`
+CMSROOT=${CONTRIB_ROOT}/cms
+if [ $static = yes ]
+then
+  msg "static compilation"
+  CMSFLAGS="$CMSFLAGS -DSTATICCOMPILE=ON"
+  CMSROOT=${CMSROOT}_static
+else
+  CMSROOT=${CMSROOT}_dyn
+fi
+
+if [ -d $CMSROOT ]; then
+  msg "$CMSROOT directory exists, assuming that cms is already set up"
+  cd $CONTRIB_ROOT
+  rm -f cms
+  ln -fvs ${CMSROOT} cms
+  exit 0
+fi
+
+mkdir $CMSROOT
+cd $CMSROOT
 VER=5.11.11
-CMSDIR=`pwd`
 wget https://github.com/msoos/cryptominisat/archive/refs/tags/${VER}.tar.gz
 tar xzvf ${VER}.tar.gz
-ln -s cryptominisat-${VER} cms
-cd cms
+cd cryptominisat-${VER}
 mkdir build && cd build
-cmake -DCMAKE_INSTALL_PREFIX=${CMSDIR} \
-  -DSTATICCOMPILE=ON \
-  -DIPASIR=ON \
-  -DONLY_SIMPLE=ON -DNOZLIB=ON -DSTATS=OFF -DNOVALGRIND=ON -DENABLE_TESTING=OFF \
-  ..
+cmake -DCMAKE_INSTALL_PREFIX=${CMSROOT} ${CMSFLAGS} ..
 make -j4
 make install
-cd ..
-cp ${CMSDIR}/cms/src/ipasir.h ${CMSDIR}/include/
+cd $CONTRIB_ROOT
+rm -f cms
+ln -vs ${CMSROOT} cms

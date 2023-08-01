@@ -56,13 +56,15 @@ fi
 if [ $cms = yes ]
 then
   CMKFLAGS="$CMKFLAGS -DUSE_CMS=ON"
-  if [ -d "contrib/cms" ]; then
-    msg "assuming that cms is already set up"
+  msg "setting up cms SAT solver"
+  if [ $static = yes ];then
+    CMSOPT="--static"
   else
-    msg "setting up cms SAT solver"
-    (cd contrib ; ./setup-cms.sh)
-    msg "cms setup done"
-	fi
+    CMSOPT=""
+  fi
+
+  (cd contrib ; ./setup-cms.sh $CMSOPT)
+  msg "cms setup done"
 else
   CMKFLAGS="$CMKFLAGS -DUSE_CMS=OFF"
 fi
