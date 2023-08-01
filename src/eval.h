@@ -7,7 +7,7 @@
 
 #pragma once
 #include "expressions.h"
-#include "minisat_ext.h"
+#include "sat_interface.h"
 #include "visitor.h"
 #include <unordered_map>
 namespace qesto {

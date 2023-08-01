@@ -8,7 +8,7 @@
 #include "encoder_to_sat.h"
 #include "expressions.h"
 #include "level_info.h"
-#include "minisat_ext.h"
+#include "sat_interface.h"
 #include "set_polarities.h"
 #include "simplify.h"
 #include <random>

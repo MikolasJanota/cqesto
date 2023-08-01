@@ -1,7 +1,7 @@
 #pragma once
 #include "auxiliary.h"
 #include "data_structures.h"
-#include "minisat_ext.h"
+#include "sat_interface.h"
 #include "variable_manager.h"
 #include "visitor.h"
 namespace qesto {

@@ -7,7 +7,7 @@
 
 #include "zigzag.h"
 #include "auxiliary.h"
-#include "minisat_ext.h"
+#include "sat_interface.h"
 #include <vector>
 using namespace qesto;
 using SATSPC::l_False;

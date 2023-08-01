@@ -68,43 +68,81 @@ if (USE_CADICAL)
   # even though we are not using minisat, we use its literals to communicate it with ipasir
   include_directories(contrib/minisat/include) 
   message(STATUS "Using cadical")
-  include_directories(contrib/cadical)
+  include_directories(contrib/cadical/)
+
+  find_library(CADICAL_LIBRARY
+    NAMES cadical
+    HINTS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/cadical/"
+    )
+  if(NOT CADICAL_LIBRARY)
+    message(FATAL_ERROR "CADICAL library not found")
+  endif()
   add_library(cadical STATIC IMPORTED GLOBAL)
+  set_target_properties(cadical PROPERTIES IMPORTED_LOCATION ${CADICAL_LIBRARY})
+
   target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE USE_IPASIR=1)
   target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC cadical)
-  set_target_properties(cadical PROPERTIES
-    IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/contrib/cadical/libcadical.a)
 elseif(USE_CMS)
   message(STATUS "Using cms")
   include_directories(contrib/cms/include)
-  add_library(cms STATIC IMPORTED GLOBAL)
+  if (STATIC_BINARY)
+    find_library(CMS_LIBRARY
+      NAMES libcryptominisat5.a cryptominisat5
+      HINTS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/cms/lib"
+      )
+  else()
+    find_library(CMS_LIBRARY
+      NAMES libcryptominisat5.so cryptominisat5
+      HINTS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/cms/lib"
+      )
+  endif()
+  if(NOT CMS_LIBRARY)
+    message(FATAL_ERROR "CMS library not found")
+  endif()
+  if (STATIC_BINARY)
+    add_library(cms STATIC IMPORTED GLOBAL)
+  else()
+    add_library(cms SHARED IMPORTED GLOBAL)
+  endif()
+  set_target_properties(cms PROPERTIES IMPORTED_LOCATION ${CMS_LIBRARY})
   target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE USE_CMS=1)
   target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC cms)
-  set_target_properties(cms PROPERTIES
-    IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/contrib/cms/lib/libcryptominisat5.a)
-    # IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/contrib/cms/lib/libipasircryptominisat5.a)
   set(THREADS_PREFER_PTHREAD_FLAG ON)
   find_package(Threads REQUIRED)
   target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC Threads::Threads)
 else()
   include_directories(contrib/minisat/include)
   message(STATUS "Using minisat")
-  target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE USE_MINISAT=1)
+
+  if (STATIC_BINARY)
+    find_library(MINISAT_LIBRARY
+      NAMES libminisat.a minisat
+      HINTS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/minisat/lib"
+      )
+  else()
+    find_library(MINISAT_LIBRARY
+      NAMES libminisat.so minisat
+      HINTS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/minisat/lib"
+      )
+  endif()
+
+  if(NOT MINISAT_LIBRARY)
+    message(FATAL_ERROR "MINISAT library not found")
+  endif()
+
+  if (STATIC_BINARY)
+    add_library(cms STATIC IMPORTED GLOBAL)
+  else()
+    add_library(cms SHARED IMPORTED GLOBAL)
+  endif()
+
 
   add_library(minisat STATIC IMPORTED GLOBAL)
-  set_target_properties(minisat PROPERTIES
-    IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/contrib/minisat/lib/libminisat.a
-  )
-  # set_target_properties(minisat PROPERTIES
-  #   IMPORTED_LOCATION_RELEASE
-  #   ${CMAKE_CURRENT_SOURCE_DIR}/contrib/minisat/lib/libminisat.a
-  #   IMPORTED_LOCATION_DEBUG
-  #   ${CMAKE_CURRENT_SOURCE_DIR}/contrib/minisat/minisat/build/debug/lib/libminisat.a
-  # )
+  set_target_properties(minisat PROPERTIES IMPORTED_LOCATION ${MINISAT_LIBRARY})
 
+  target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE USE_MINISAT=1)
   target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC minisat)
 endif()
-
 
 message(STATUS "Build type : ${CMAKE_BUILD_TYPE}")
 message(STATUS "CXXFLAGS   : ${CMAKE_CXX_FLAGS}")

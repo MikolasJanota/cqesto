@@ -1,7 +1,7 @@
 #pragma once
 
 #include "auxiliary.h"
-#include "minisat_ext.h"
+#include "sat_interface.h"
 #include <algorithm>
 #include <cinttypes>
 #include <iostream>

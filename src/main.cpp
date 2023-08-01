@@ -24,15 +24,11 @@ unordered_map<int, std::string> var2name;
 int main(int argc, char **argv) {
 #ifndef NDEBUG
     cout << "c DEBUG version." << endl;
-#endif
-#ifdef STATICLN
-    cout << "c STATIC version." << endl;
-#else
-    cout << "c DYNLINK version." << endl;
+    cout << "c Should not be used for heavy computation!" << endl;
 #endif
 
 #ifdef USE_IPASIR
-    cout << "c solver IPASIR (cadical)" << endl;
+    cout << "c solver cadical (via IPASIR)" << endl;
 #endif /*USE_IPASIR*/
 #ifdef USE_MINISAT
     cout << "c solver MINISAT" << endl;

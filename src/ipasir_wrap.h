@@ -15,13 +15,13 @@
 #include <vector>
 namespace SATSPC {
 std::ostream &operator<<(std::ostream &outs, Lit lit);
-class MiniSatExt {
+class IPASIRWrap {
   public:
     inline const Minisat::LSet &get_conflict() { return _conflict; }
     inline const Minisat::vec<Minisat::lbool> &model() { return _model; }
-    MiniSatExt() : _nvars(0) { _s = ipasir_init(); }
+    IPASIRWrap() : _nvars(0) { _s = ipasir_init(); }
 
-    virtual ~MiniSatExt() { ipasir_release(_s); }
+    virtual ~IPASIRWrap() { ipasir_release(_s); }
 
     inline void setFrozen(Var, bool) {}
     inline void bump(Var) {}
@@ -104,7 +104,7 @@ class MiniSatExt {
     }
 };
 
-inline bool MiniSatExt::solve(const Minisat::vec<Minisat::Lit> &assumps) {
+inline bool IPASIRWrap::solve(const Minisat::vec<Minisat::Lit> &assumps) {
     for (int i = 0; i < assumps.size(); ++i) {
         ipasir_assume(_s, lit2val(assumps[i]));
     }
@@ -120,7 +120,7 @@ inline bool MiniSatExt::solve(const Minisat::vec<Minisat::Lit> &assumps) {
     return rv;
 }
 
-inline bool MiniSatExt::solve() {
+inline bool IPASIRWrap::solve() {
     const int r = ipasir_solve(_s);
     assert(r == 10 || r == 20);
     if (r != 10 && r != 20) {

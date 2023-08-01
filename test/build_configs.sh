@@ -21,12 +21,13 @@ for g in '-g' '' ; do
             if [[ ! -z "${g}" ]]; then oname=${oname}'_dbg'; fi
             ./configure $g $s $sat 
             cd build
-            make -j 4
+            make -j 4 >/dev/null
             if [ -s ${program_name} ]
             then
                 echo "===== Compiled: ${oname}"
             fi
             cd ..
+            rm -rfv $oname
             mv -v build $oname
         done
     done
