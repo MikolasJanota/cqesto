@@ -7,8 +7,10 @@
 #include "qcir_parser.h"
 #include "auxiliary.h"
 #include "stream_buffer.h"
-#include <cctype>
-#include <cstdlib>
+#include <cassert>
+#include <cctype>   // for isalnum
+#include <cstdlib>  // for exit
+#include <iostream> // for cerr
 
 void QCIRParser::parse() { qcir_file(); }
 void QCIRParser::qcir_file() {
@@ -24,7 +26,7 @@ void QCIRParser::qcir_file() {
 
 void QCIRParser::format_id() {
     bool found = false;
-    // even though it's not permitted in the format, try to avoid comments
+    // even though it's not permitted in the format, we try to avoid comments
     // before the header
     while (!found) {
         match_char('#');
@@ -34,14 +36,15 @@ void QCIRParser::format_id() {
                 ++d_buf;
             match_string("14", false);
             found = true;
-        } else {
-            while (*d_buf != '\n' && *d_buf != '\r' && *d_buf != EOF)
-                ++d_buf;
-            if (*d_buf != EOF)
-                nlchar();
         }
+        skip_line();
     }
-    nltoken();
+}
+
+void QCIRParser::skip_line() {
+    while (*d_buf != '\n' && *d_buf != '\r' && *d_buf != EOF)
+        ++d_buf;
+    nlchar();
 }
 
 void QCIRParser::output_stmt() {
@@ -190,16 +193,8 @@ void QCIRParser::match_char_token(char c) {
 
 std::ostream &QCIRParser::err() {
     if (d_filename.empty())
-        return std::cerr << "ERROR on line" << d_ln << ":";
+        return std::cerr << "ERROR on line " << d_ln << ":";
     return std::cerr << d_filename << ":" << d_ln << ":";
-}
-
-void QCIRParser::skip_end_of_line() {
-    while (true) {
-        if (*d_buf == EOF)
-            return;
-        ++d_buf;
-    }
 }
 
 int QCIRParser::skip() {

@@ -5,11 +5,11 @@
  * Copyright (C) 2023, Mikolas Janota
  */
 #pragma once
-#include "stream_buffer.h"
-#include <algorithm>
-#include <cstddef>
-#include <sstream>
-#include <string>
+#include "stream_buffer.h" // for StreamBuffer
+#include <cstddef>         // for size_t
+#include <sstream>         // for ostream, stringstream
+#include <string>          // for string, basic_string
+#include <utility>         // for pair
 class QCIRParser {
   public:
     QCIRParser(StreamBuffer &buf) : d_buf(buf) {}
@@ -46,7 +46,6 @@ class QCIRParser {
     void nltoken();
     void nlchar();
     int skip();
-    void skip_end_of_line();
     void match_string(const char *s, bool run_skip = true);
     void match_char_token(char c);
     void match_char(char c);
@@ -54,6 +53,7 @@ class QCIRParser {
         skip();
         return *d_buf;
     }
+    void skip_line();
     std::ostream &err();
     std::stringstream d_varbuf;
 };

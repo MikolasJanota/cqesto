@@ -100,6 +100,12 @@ bool ZigZag::solve() {
             (*dprn) << " " << dl;
         }
         std::cout << " 0" << std::endl;
+        std::cout << "iv";
+        for (auto v : levels.level_vars(0)) {
+            const bool vv = solvers[0]->val(v) == l_True;
+            std::cout<< " " << (vv ? '+' : '-') << v;
+        }
+        std::cout << " 0" << std::endl;
     }
     return status == l_True;
 }

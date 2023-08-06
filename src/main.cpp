@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
         ->default_val(true);
     app.add_flag("-f, !--no-f", options.flatten, "Use flattening.")
         ->default_val(false);
-    app.add_flag("-l, !--no-l", options.luby_restart, "Use  luby restarts.")
+    app.add_flag("-l, !--no-l", options.luby_restart, "Use luby restarts.")
         ->default_val(false);
     app.add_flag("-p, !--no-p", options.polarities, "Set variable polarities.")
         ->default_val(false);
@@ -89,6 +89,7 @@ int main(int argc, char **argv) {
     if (options.file_name != "-")
         parser.d_filename = options.file_name;
     parser.parse();
+    gzclose(in);
 
     for (auto i : parser.name2var())
         var2name[i.second] = i.first;
