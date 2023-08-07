@@ -225,6 +225,14 @@ class NiceExpressionPrinter
         return (*this) << (sign(lit) ? '-' : '+') << var(lit);
     }
 
+    NiceExpressionPrinter &operator<<(const VarVector &vs) {
+        auto &me = *this;
+        me << '[';
+        for (size_t i = 0; i < vs.size(); i++)
+            me << (i ? " " : "") << vs[i];
+        return me << ']';
+    }
+
     std::ostream &print(ID node, size_t offset = 0) {
         return visit(node, offset);
     }

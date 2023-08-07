@@ -71,6 +71,14 @@ int main(int argc, char **argv) {
                  "Initialize all abstractions with the input formula right at "
                  "the beginning.")
         ->default_val(true);
+    app.add_flag(
+           "-X, --enumerate", options.enumerate,
+           "Enumerate solutions. If free variables are given, they are "
+           "merged with the first quantifier block and winning moves of the "
+           "first block quantifier are enumerated over the free variables. If "
+           "no free variables are given, solutions are just enumerated over "
+           "the whole set of variables in the first block.")
+        ->default_val(false);
     app.add_flag("-v", options.verbose, "Add verbosity.")->default_val(0);
     CLI11_PARSE(app, argc, argv);
 
@@ -82,31 +90,42 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    using qesto::ZigZag;
-    qesto::Expressions factory(options);
+    auto factory = new qesto::Expressions(options);
     StreamBuffer buf(in);
-    qesto::QestoQCIRParser parser(buf, factory);
+    qesto::QestoQCIRParser parser(buf, *factory);
     if (options.file_name != "-")
         parser.d_filename = options.file_name;
     parser.parse();
     gzclose(in);
 
+    if (!options.enumerate && !parser.formula().free.empty()) {
+        cerr << "ERROR! Free variables not supported: " << options.file_name
+             << endl;
+        exit(EXIT_FAILURE);
+    }
+    options.has_free = parser.has_free();
+
     for (auto i : parser.name2var())
         var2name[i.second] = i.first;
-    qesto::NiceExpressionPrinter *dprn =
-        new qesto::NiceExpressionPrinter(factory, var2name, cout);
-    ps = new qesto::ZigZag(options, factory, parser.formula());
-    ps->dprn = dprn;
-    const bool r = ps->solve();
+    qesto::NiceExpressionPrinter dprn(*factory, var2name, cout);
+    ps = new qesto::ZigZag(options, *factory, parser.formula(), dprn);
+    bool res;
+    if (options.enumerate) {
+        const int count = ps->solve_all();
+        res = count > 0;
+        std::cout << "c found " << count << " models" << std::endl;
+    } else {
+        res = ps->solve();
+    }
     std::cout << "c solved " << read_cpu_time() << std::endl;
     ps->print_stats(cerr);
-    std::cout << "s cnf " << (r ? '1' : '0') << std::endl;
+    std::cout << "s cnf " << (res ? '1' : '0') << std::endl;
 #ifndef NDEBUG
     delete ps;
-    delete dprn;
+    delete factory;
 #endif
-    exit(r ? 10 : 20);
-    return r ? 10 : 20;
+    exit(res ? 10 : 20);
+    return res ? 10 : 20;
 }
 
 static void SIG_handler(int signum) {

@@ -98,26 +98,14 @@ void QCIRParser::gate_stmt() {
 }
 
 void QCIRParser::qblock_prefix() {
+    free_quant();
     while (!is_end()) {
         if (!qblock_quant())
             break;
     }
 }
 
-bool QCIRParser::qblock_quant() {
-    skip();
-
-    switch (*d_buf) {
-    case 'e':
-        match_string("exists");
-        cb_qblock_quant(QType::EXIST);
-        break;
-    case 'f':
-        match_string("forall");
-        cb_qblock_quant(QType::FORALL);
-        break;
-    default: return false;
-    }
+void QCIRParser::var_list() {
     match_char_token('(');
     while (next() != ')') {
         cb_qblock_var(var());
@@ -126,6 +114,35 @@ bool QCIRParser::qblock_quant() {
     }
     match_char_token(')');
     nltoken();
+}
+
+bool QCIRParser::free_quant() {
+    skip();
+    if (*d_buf != 'f' && *d_buf != 'F')
+        return false;
+    match_string("free");
+    cb_qblock_quant(QType::FREE);
+    var_list();
+    cb_quant_closed();
+    return true;
+}
+
+bool QCIRParser::qblock_quant() {
+    skip();
+    switch (*d_buf) {
+    case 'e':
+    case 'E':
+        match_string("exists");
+        cb_qblock_quant(QType::EXIST);
+        break;
+    case 'f':
+    case 'F':
+        match_string("forall");
+        cb_qblock_quant(QType::FORALL);
+        break;
+    default: return false;
+    }
+    var_list();
     cb_quant_closed();
     return true;
 }

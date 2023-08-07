@@ -18,7 +18,7 @@ class QCIRParser {
 
   protected:
     size_t d_ln = 1;
-    enum QType { FORALL, EXIST };
+    enum QType { FORALL, EXIST, FREE };
     enum GType { AND, OR, XOR, ITE };
     typedef std::pair<bool, std::string> Lit;
     StreamBuffer &d_buf;
@@ -39,6 +39,7 @@ class QCIRParser {
     void format_id();
     void qblock_prefix();
     bool qblock_quant();
+    bool free_quant();
     void var_list();
     std::string var();
     void lit_list();

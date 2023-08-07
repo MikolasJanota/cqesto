@@ -21,6 +21,7 @@ inline QuantifierType opponent(QuantifierType qt) {
 }
 
 typedef struct {
+    VarVector free;
     Prefix pref;
     ID output;
 } QFla;

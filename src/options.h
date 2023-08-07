@@ -19,5 +19,8 @@ class Options {
     bool polarities;
     bool full;
     bool luby_restart;
+    bool enumerate;
     int verbose;
+
+    bool has_free = false;
 };

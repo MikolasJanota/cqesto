@@ -21,6 +21,7 @@ class QestoQCIRParser : public QCIRParser {
         : QCIRParser(buf), d_factory(factory) {}
 
     QFla formula() { return d_qfla; }
+    bool has_free() const { return d_has_free; }
 
     const VariableManager &vmng() const { return d_vmng; }
     const std::unordered_map<std::string, int> &name2var() {
@@ -75,12 +76,19 @@ class QestoQCIRParser : public QCIRParser {
 
     virtual void cb_quant_closed() override {
         QuantifierType qt;
+        bool free = false;
         switch (d_qt) {
+        case QType::FREE: free = true; break;
         case QType::EXIST: qt = qesto::EXISTENTIAL; break;
         case QType::FORALL: qt = qesto::UNIVERSAL; break;
         }
-        d_qfla.pref.push_back(
-            qesto::Quantification(qt, qesto::VarVector(d_qcir_var_stack)));
+        if (free) {
+            d_qfla.free = std::move(d_qcir_var_stack);
+            d_has_free = true;
+        } else {
+            d_qfla.pref.push_back(
+                qesto::Quantification(qt, std::move(d_qcir_var_stack)));
+        }
         d_qcir_var_stack.clear();
     }
 
@@ -96,6 +104,7 @@ class QestoQCIRParser : public QCIRParser {
     Expressions &d_factory;
     VariableManager d_vmng;
     QFla d_qfla;
+    bool d_has_free = false;
     Lit d_output_lit;
     std::string d_gate_var;
     GType d_gate_type;
