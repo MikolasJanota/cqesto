@@ -25,17 +25,18 @@ void QCIRParser::qcir_file() {
 }
 
 void QCIRParser::format_id() {
-    bool found = false;
+    d_found_header = false;
     // even though it's not permitted in the format, we try to avoid comments
-    // before the header
-    while (!found) {
+    // before the header, we also allow files without headers, because this is
+    // apparently the practice
+    while (!d_found_header && *d_buf == '#') {
         match_char('#');
         if (*d_buf == 'Q') {
             match_string("qcir-", false);
             if (*d_buf == 'g' or *d_buf == 'G')
                 ++d_buf;
             match_string("14", false);
-            found = true;
+            d_found_header = true;
         }
         skip_line();
     }

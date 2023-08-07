@@ -103,6 +103,10 @@ int main(int argc, char **argv) {
              << endl;
         exit(EXIT_FAILURE);
     }
+    if (!parser.found_header()) {
+        cerr << "WARNING! missing header." << endl;
+    }
+
     options.has_free = parser.has_free();
 
     for (auto i : parser.name2var())

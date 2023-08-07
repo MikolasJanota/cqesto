@@ -15,9 +15,11 @@ class QCIRParser {
     QCIRParser(StreamBuffer &buf) : d_buf(buf) {}
     void parse();
     std::string d_filename; // only err reporting
+    bool found_header() const { return d_found_header; }
 
   protected:
     size_t d_ln = 1;
+    bool d_found_header = false;
     enum QType { FORALL, EXIST, FREE };
     enum GType { AND, OR, XOR, ITE };
     typedef std::pair<bool, std::string> Lit;
