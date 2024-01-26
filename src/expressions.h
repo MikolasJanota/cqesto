@@ -11,8 +11,8 @@
 #include "table.h"
 namespace qesto {
 typedef ImmutableVector<Var, std::hash<int>> VarVector;
-typedef ImmutableVector_hash<ID, ID_hash> IDVector_hash;
-typedef ImmutableVector_equal<ID, ID_hash> IDVector_equal;
+typedef ImmutableVector_hash<ID, std::hash<ID>> IDVector_hash;
+typedef ImmutableVector_equal<ID, std::hash<ID>> IDVector_equal;
 typedef std::unordered_map<Var, bool> Substitution;
 
 class Expressions {
@@ -94,6 +94,6 @@ class Expressions {
     const Options &options;
     Table<IDVector, IDVector_hash, IDVector_equal> ands;
     Table<IDVector, IDVector_hash, IDVector_equal> ors;
-    Table<ID, ID_hash, ID_equal> nots;
+    Table<ID, std::hash<ID>, std::equal_to<ID>> nots;
 };
 } // namespace qesto

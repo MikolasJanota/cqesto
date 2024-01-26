@@ -37,7 +37,7 @@ class ID {
     inline NodeType get_type() const { return type; }
     inline size_t get_index() const { return index; }
     inline uint64_t toInt() const { // careful with precedence of "<<"!
-        return (((uint64_t)type) << 32) + index;
+        return (static_cast<uint64_t>(type) << 32) + index;
     }
     static ID fromInt(uint64_t i) { return ID(i); }
 #if USE_CMS
@@ -80,18 +80,6 @@ inline bool operator!=(const ID &i1, const ID &i2) {
     return i1.get_type() != i2.get_type() || i1.get_index() != i2.get_index();
 }
 
-class ID_equal {
-  public:
-    inline bool operator()(const ID &i1, const ID &i2) const {
-        return i1.get_type() == i2.get_type() &&
-               i1.get_index() == i2.get_index();
-    }
-};
-
-struct ID_hash {
-    inline size_t operator()(const ID &i) const { return i.toInt(); }
-};
-
 inline std::ostream &operator<<(std::ostream &o, ID id) {
     o << '[';
     switch (id.get_type()) {
@@ -109,7 +97,7 @@ inline std::ostream &operator<<(std::ostream &o, ID id) {
 
 namespace std {
 template <> struct hash<qesto::ID> {
-    inline size_t operator()(qesto::ID i) const { return i.toInt(); }
+    inline size_t operator()(const qesto::ID& i) const { return i.toInt(); }
 };
 
 template <> struct hash<pair<qesto::ID, bool>> {

@@ -93,12 +93,12 @@ class MemoizedExpressionVisitor : public ExpressionVisitor<R> {
     }
 
   protected:
-    inline const std::unordered_map<ID, R, ID_hash, ID_equal> &get_m() {
+    inline const std::unordered_map<ID, R> &get_m() {
         return m;
     }
 
   private:
-    std::unordered_map<ID, R, ID_hash, ID_equal> m;
+    std::unordered_map<ID, R> m;
 };
 
 template <class R, class A>

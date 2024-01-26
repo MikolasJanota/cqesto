@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.24)
 project(cqesto)
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
+include(Helpers)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(Git)
 if(NOT CMAKE_BUILD_TYPE)
@@ -10,6 +14,7 @@ endif()
 option(USE_CADICAL "Use cadical as the base solver" OFF)
 option(USE_CMS "Use cms as the base solver" OFF)
 option(STATIC_BINARY "Compile static" OFF)
+option(PROFILING "Compile with profiling support" OFF)
 
 # Add sanitizer flags for C++ compiler for "Debug" configuration
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address,undefined,bool")
@@ -56,10 +61,19 @@ list(APPEND CPPSOURCES "${CMAKE_CURRENT_BINARY_DIR}/version.cpp")
  
 add_executable(${CMAKE_PROJECT_NAME} ${CPPSOURCES} ${CSOURCES})
 
+if (PROFILING)
+  add_check_c_cxx_flag("-pg")
+  add_check_c_cxx_flag("-ggdb3")
+endif()
+
 if (STATIC_BINARY)
   set(ZLIB_USE_STATIC_LIBS "ON")
   target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC "-static")
 endif()
+
+# CMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} -pg"
+# CMAKE_EXE_LINKER_FLAGS="${CMAKE_EXE_LINKER_FLAGS} -pg"
+# CMAKE_SHARED_LINKER_FLAGS="${CMAKE_SHARED_LINKER_FLAGS} -pg"
 
 find_package(ZLIB)
 target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC ZLIB::ZLIB)

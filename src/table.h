@@ -6,6 +6,7 @@
  */
 #pragma once
 #include <map>
+#include <cstddef>
 #include <unordered_map>
 #include <vector>
 template <class ContentType, class ContentHash, class ContentEqual>

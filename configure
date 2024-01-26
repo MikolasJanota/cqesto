@@ -27,6 +27,7 @@ die () {
 debug=no
 cadical=no
 cms=no
+prof=no
 static=no
 
 while [ $# -gt 0 ]
@@ -36,6 +37,7 @@ do
     -g|--debug) debug=yes;;
     -c|--cadical) cadical=yes;;
     -r|--cms) cms=yes;;
+    -p|--prof) prof=yes;;
     -s|--static) static=yes;;
     *) die "invalid option '$1' (try '-h')";;
   esac
@@ -97,6 +99,14 @@ then
   CMKFLAGS="$CMKFLAGS -DCMAKE_BUILD_TYPE=Debug"
 else
   CMKFLAGS="$CMKFLAGS -DCMAKE_BUILD_TYPE=Release"
+fi
+
+if [ $prof = yes ]
+then
+  msg "compilation with profiling"
+  CMKFLAGS="$CMKFLAGS -DPROFILING=ON"
+else
+  CMKFLAGS="$CMKFLAGS -DPROFILING=OFF"
 fi
 
 mkdir -p build

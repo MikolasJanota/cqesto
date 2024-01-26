@@ -8,7 +8,7 @@
 #include "data_structures.h"
 #include "immutable_vector.h"
 namespace qesto {
-class IDVector : public ImmutableVector<ID, ID_hash> {
+class IDVector : public ImmutableVector<ID, std::hash<ID>> {
   public:
     using ImmutableVector::ImmutableVector; // inherit constructors
 

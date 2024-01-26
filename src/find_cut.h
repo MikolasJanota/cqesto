@@ -19,7 +19,7 @@ class FindCut : MemoizedExpressionVisitor<bool> {
         : MemoizedExpressionVisitor<bool>(factory), vals(vals) {}
 
     void operator()(ID n) { visit(n); }
-    const std::unordered_set<ID, ID_hash, ID_equal> &get_cut() const {
+    const std::unordered_set<ID> &get_cut() const {
         return cut;
     }
 
@@ -65,7 +65,7 @@ class FindCut : MemoizedExpressionVisitor<bool> {
 
   private:
     Eval &vals;
-    std::unordered_set<ID, ID_hash, ID_equal> cut;
+    std::unordered_set<ID> cut;
     inline bool visit_ops(IDVector ops) {
         for (const auto &i : ops)
             visit(i);

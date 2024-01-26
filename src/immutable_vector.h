@@ -119,8 +119,7 @@ bool ImmutableVector<T, HashFun>::equals(
 }
 
 template <class T, class HashFun>
-class const_ImmutableVectorIterator
-    : public std::iterator<std::forward_iterator_tag, T> {
+class const_ImmutableVectorIterator {
   public:
     const_ImmutableVectorIterator(const ImmutableVector<T, HashFun> &ls,
                                   size_t x)
