@@ -10,6 +10,7 @@ usage: configure [-h|--help][-g|--debug][-e|--expert]
 -h | --help    print this command line option summary
 -g | --debug   compile with assertion checking and symbols
 -c | --cadical compile with cadical instead of minisat
+-p | --prof compilation with profiling
 -r | --cms compile with cryptominisat (cms) instead of minisat
 -s | --static compile static
 EOF
