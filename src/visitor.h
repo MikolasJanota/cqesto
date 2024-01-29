@@ -117,7 +117,7 @@ class MemoizedExpressionArgumentVisitor
         if (i != m.end())
             return i->second;
         R val = ExpressionArgumentVisitor<R, A>::visit(expression, argument);
-        m[key] = val;
+        m.insert(i, {key, val});
         return val;
     }
 
