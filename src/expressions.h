@@ -69,9 +69,20 @@ class Expressions {
         return open_lit(o1) == ~open_lit(o2);
     }
 
-    const IDVector open_and(ID node) const;
-    const IDVector open_or(ID node) const;
-    const ID open_not(ID node) const;
+inline const IDVector open_and(ID node) const {
+    assert(node.get_type() == AND);
+    return ands.get(node.get_index());
+}
+
+inline const IDVector open_or(ID node) const {
+    assert(node.get_type() == OR);
+    return ors.get(node.get_index());
+}
+
+inline const ID open_not(ID node) const {
+    assert(node.get_type() == NEGATION);
+    return nots.get(node.get_index());
+}
 
     // returns true for the cases when it does not push o into operands
     bool add_operand(std::vector<ID> &operands, ID o, NodeType top_level) {

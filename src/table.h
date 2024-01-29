@@ -13,13 +13,13 @@ template <class ContentType, class ContentHash, class ContentEqual>
 class Table {
   public:
     Table() : entry_count(0) {}
-    ContentType get(size_t index) const { return s[index]; }
+    inline const ContentType& get(size_t index) const { return s[index]; }
     size_t lookup(ContentType content) {
         const auto it = m.find(content);
         if (it == m.end()) {
             s.resize(entry_count + 1);
             s[entry_count] = content;
-            m[content] = entry_count;
+            m.insert(it, {content, entry_count});
             return entry_count++;
         } else {
             return it->second;

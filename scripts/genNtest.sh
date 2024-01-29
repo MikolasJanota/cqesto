@@ -25,7 +25,7 @@ while [[ $N > 0 ]]; do
   HS=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1`
   STAMP=`date +%s`_${HS}
   I=/tmp/gNt_${STAMP}.qcir
-  ./genqcir.py 5 3 2 4 >$I
+  ./genqcir.py 10 3 2 5 >$I
   chmod -w $I
   echo $STAMP
   ( $LIMIT ; /usr/bin/time -f"%U %S %e %M" bash -c "$S1 $I >/dev/null 2>/dev/null" 2>&1 )

@@ -45,7 +45,7 @@ template <class T, class HashFun> class ImmutableVector {
         _hash_code = ls._hash_code;
         _size = ls._size;
         _data = ls._data;
-        if (_data != NULL)
+        if (_data != nullptr)
             ++(_data->count);
         return *this;
     }

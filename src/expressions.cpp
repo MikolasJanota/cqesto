@@ -59,17 +59,3 @@ ID Expressions::make_not(ID operand) {
     }
 }
 
-const IDVector Expressions::open_and(ID node) const {
-    assert(node.get_type() == AND);
-    return ands.get(node.get_index());
-}
-
-const IDVector Expressions::open_or(ID node) const {
-    assert(node.get_type() == OR);
-    return ors.get(node.get_index());
-}
-
-const ID Expressions::open_not(ID node) const {
-    assert(node.get_type() == NEGATION);
-    return nots.get(node.get_index());
-}

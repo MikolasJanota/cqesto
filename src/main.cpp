@@ -17,7 +17,7 @@
 #include <string>
 using namespace std;
 
-qesto::ZigZag *ps = NULL;
+qesto::ZigZag *ps = nullptr;
 static void SIG_handler(int signum);
 
 unordered_map<int, std::string> var2name;
