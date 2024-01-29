@@ -131,9 +131,6 @@ ID LevelSolver::learn(const std::unordered_set<Var> &dom,
         assert(j != cut2id.end());
         const ID l = j->second;
         ops.push_back(mp(factory.make_not(l)));
-        if (options.verbose > 3)
-            (*dprn) << "mp:" << factory.make_not(l) << ":" << ops.back()
-                    << '\n';
     }
     const auto lrn = factory.make_or(ops);
     if (options.verbose > 3)

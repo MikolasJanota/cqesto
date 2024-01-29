@@ -5,16 +5,25 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 include(Helpers)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-find_package(Git)
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "Release" CACHE STRING
-        "Default build type: Release" FORCE)
-endif()
 
 option(USE_CADICAL "Use cadical as the base solver" OFF)
 option(USE_CMS "Use cms as the base solver" OFF)
 option(STATIC_BINARY "Compile static" OFF)
 option(PROFILING "Compile with profiling support" OFF)
+
+find_package(Git)
+
+if (PROFILING)
+  set(CMAKE_BUILD_TYPE RelWithDebInfo)
+  add_check_c_cxx_flag("-pg")
+  add_check_c_cxx_flag("-ggdb3")
+endif()
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING
+        "Default build type: Release" FORCE)
+endif()
+
 
 # Add sanitizer flags for C++ compiler for "Debug" configuration
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address,undefined,bool")
@@ -60,11 +69,6 @@ file(GLOB CSOURCES "src/*.c")
 list(APPEND CPPSOURCES "${CMAKE_CURRENT_BINARY_DIR}/version.cpp")
  
 add_executable(${CMAKE_PROJECT_NAME} ${CPPSOURCES} ${CSOURCES})
-
-if (PROFILING)
-  add_check_c_cxx_flag("-pg")
-  add_check_c_cxx_flag("-ggdb3")
-endif()
 
 if (STATIC_BINARY)
   set(ZLIB_USE_STATIC_LIBS "ON")
