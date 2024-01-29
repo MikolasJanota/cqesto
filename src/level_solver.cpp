@@ -23,8 +23,8 @@ std::mt19937 LevelSolver::rgen(1);
 LevelSolver::LevelSolver(const Options &options, Expressions &factory,
                          size_t lev, const LevelInfo &levs)
     : options(options), factory(factory), lev(lev), levs(levs),
-      enc(factory, sat, variable_manager), simpl(options, factory, enc),
-      pol(factory, enc) {}
+      is_last(levs.qlev_count() <= lev), enc(factory, sat, variable_manager),
+      simpl(options, factory, enc), pol(factory, enc) {}
 
 void LevelSolver::add_var(Var v, VarType vt) {
     assert(constrs.empty());
@@ -39,7 +39,7 @@ void LevelSolver::add_var(Var v, VarType vt) {
 void LevelSolver::add_constr(ID c) {
     const ID strengthening = options.simplify ? simpl(c) : c;
     if (options.verbose > 3) {
-        std::cerr << "add_constr" << std::endl;
+        std::cerr << "add_constr@" << lev << std::endl;
         (*dprn)(strengthening) << std::endl;
     }
     constrs.push_back(strengthening);
@@ -49,8 +49,15 @@ void LevelSolver::add_constr(ID c) {
 }
 
 std::unordered_set<ID> LevelSolver::find_cut(const Substitution &assumptions) {
-    return options.simple_cut ? find_cut_simple(assumptions)
-                              : find_cut_orig(assumptions);
+    if (is_last) {
+        std::unordered_set<ID> cut;
+        for (const auto &i : constrs)
+            cut.insert(factory.make_not(i));
+        return cut;
+    } else {
+        return options.simple_cut ? find_cut_simple(assumptions)
+                                  : find_cut_orig(assumptions);
+    }
 }
 
 std::unordered_set<ID>
@@ -75,17 +82,18 @@ LevelSolver::find_cut_simple(const Substitution &assumptions) {
 }
 
 bool LevelSolver::solve(const Substitution &assumptions) {
+    std::unordered_set<ID> cut = find_cut(assumptions);
     if (options.verbose > 3) {
         std::cerr << "solving" << std::endl;
         std::cerr << "assump";
         for (const auto &i : assumptions)
             (*dprn) << " " << mkLit(i.first, !(i.second));
-        std::cerr << "[" << std::endl;
+        std::cerr << " [" << std::endl;
         for (const auto &i : constrs)
             (*dprn)(i) << std::endl;
         std::cerr << "]" << std::endl;
+        (*dprn) << "cut:" << cut << '\n';
     }
-    std::unordered_set<ID> cut = find_cut(assumptions);
     SATCLS cut_clause;
     SATCLS_CAPACITY(cut_clause, cut.size());
     cut2id.clear();
@@ -123,12 +131,13 @@ ID LevelSolver::learn(const std::unordered_set<Var> &dom,
         assert(j != cut2id.end());
         const ID l = j->second;
         ops.push_back(mp(factory.make_not(l)));
+        if (options.verbose > 3)
+            (*dprn) << "mp:" << factory.make_not(l) << ":" << ops.back()
+                    << '\n';
     }
     const auto lrn = factory.make_or(ops);
-    if (options.verbose > 3) {
-        std::cerr << "lrn:";
-        (*dprn)(lrn) << std::endl;
-    }
+    if (options.verbose > 3)
+        (*dprn) << "lrn:" << lrn << '\n';
     return lrn;
 }
 

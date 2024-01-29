@@ -6,6 +6,8 @@
  */
 #pragma once
 #include "expressions.h"
+#include <unordered_set>
+#include <vector>
 
 namespace qesto {
 template <class R> class ExpressionVisitor {
@@ -199,6 +201,37 @@ class NiceExpressionPrinter
 
     std::ostream &operator()(ID node, size_t offset = 0) {
         return visit(node, offset);
+    }
+
+    NiceExpressionPrinter &operator<<(ID n) {
+        visit(n, 0);
+        return *this;
+    }
+
+    NiceExpressionPrinter &operator<<(std::unordered_set<ID> ns) {
+        auto &s = *this;
+        s << "{";
+        bool f = true;
+        for (const auto &n : ns) {
+            if (!f)
+                s << ",";
+            f = false;
+            s << n;
+        }
+        return s << "}";
+    }
+
+    NiceExpressionPrinter &operator<<(std::vector<ID> ns) {
+        auto &s = *this;
+        s << "[";
+        bool f = true;
+        for (const auto &n : ns) {
+            if (!f)
+                s << ",";
+            f = false;
+            s << n;
+        }
+        return s << "]";
     }
 
     NiceExpressionPrinter &operator<<(const char c) {

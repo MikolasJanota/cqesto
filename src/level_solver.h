@@ -41,6 +41,7 @@ class LevelSolver {
     Expressions &factory;
     const size_t lev;
     const LevelInfo &levs;
+    const bool is_last;
     std::unordered_set<Var> vars;
     std::unordered_set<Var> dom_vars;
     std::unordered_set<Var> plvars;
