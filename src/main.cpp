@@ -67,6 +67,9 @@ int main(int argc, char **argv) {
         ->default_val(false);
     app.add_flag("-p, !--no-p", options.polarities, "Set variable polarities.")
         ->default_val(false);
+    app.add_flag("-c, !--no-c", options.simple_cut,
+                 "Simple find cut (faster but potentially less inteligent).")
+        ->default_val(false);
     app.add_flag("-e, !--no-e", options.full,
                  "Initialize all abstractions with the input formula right at "
                  "the beginning.")

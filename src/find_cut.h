@@ -15,13 +15,10 @@ class FindCut : MemoizedExpressionVisitor<bool> {
   public:
     typedef std::unordered_map<Var, bool> Vals;
 
-    FindCut(Expressions &factory, Eval &vals)
-        : MemoizedExpressionVisitor<bool>(factory), vals(vals) {}
+    FindCut(Expressions &factory, Eval &vals, std::unordered_set<ID> &pcut)
+        : MemoizedExpressionVisitor<bool>(factory), vals(vals), cut(pcut) {}
 
     void operator()(ID n) { visit(n); }
-    const std::unordered_set<ID> &get_cut() const {
-        return cut;
-    }
 
     virtual bool visit_lit(ID node, Lit) {
         const SATSPC::lbool v = vals(node);
@@ -65,7 +62,7 @@ class FindCut : MemoizedExpressionVisitor<bool> {
 
   private:
     Eval &vals;
-    std::unordered_set<ID> cut;
+    std::unordered_set<ID> &cut;
     inline bool visit_ops(IDVector ops) {
         for (const auto &i : ops)
             visit(i);

@@ -83,19 +83,18 @@ class MemoizedExpressionVisitor : public ExpressionVisitor<R> {
   public:
     MemoizedExpressionVisitor(Expressions &factory)
         : ExpressionVisitor<R>(factory) {}
+
     virtual R visit(ID expression) {
         const auto i = m.find(expression);
         if (i != m.end())
             return i->second;
         R val = ExpressionVisitor<R>::visit(expression);
-        m[expression] = val;
+        m.insert(i, {expression, val});
         return val;
     }
 
   protected:
-    inline const std::unordered_map<ID, R> &get_m() {
-        return m;
-    }
+    inline const std::unordered_map<ID, R> &get_m() { return m; }
 
   private:
     std::unordered_map<ID, R> m;

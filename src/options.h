@@ -20,6 +20,7 @@ class Options {
     bool full;
     bool luby_restart;
     bool enumerate;
+    bool simple_cut;
     int verbose;
 
     bool has_free = false;

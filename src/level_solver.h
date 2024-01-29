@@ -52,5 +52,8 @@ class LevelSolver {
     Simplify simpl;
     SetPolarities pol;
     bool lastSolve;
+    std::unordered_set<ID> find_cut(const Substitution &assumptions);
+    std::unordered_set<ID> find_cut_orig(const Substitution &assumptions);
+    std::unordered_set<ID> find_cut_simple(const Substitution &assumptions);
 };
 } // namespace qesto

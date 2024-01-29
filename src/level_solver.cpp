@@ -11,6 +11,8 @@
 #include "find_cut.h"
 #include "make_possible.h"
 #include "max_qlev.h"
+#include "minisat/core/SolverTypes.h"
+#include "sat_interface.h"
 #include <random>
 #include <vector>
 using namespace qesto;
@@ -46,6 +48,32 @@ void LevelSolver::add_constr(ID c) {
         pol(strengthening);
 }
 
+std::unordered_set<ID> LevelSolver::find_cut(const Substitution &assumptions) {
+    return options.simple_cut ? find_cut_simple(assumptions)
+                              : find_cut_orig(assumptions);
+}
+
+std::unordered_set<ID>
+LevelSolver::find_cut_orig(const Substitution &assumptions) {
+    Eval ev(factory, assumptions);
+    for (const auto &i : constrs)
+        ev(i);
+    std::unordered_set<ID> cut;
+    FindCut fc(factory, ev, cut);
+    for (const auto &i : constrs)
+        fc(i);
+    return cut;
+}
+
+std::unordered_set<ID>
+LevelSolver::find_cut_simple(const Substitution &assumptions) {
+    std::unordered_set<ID> cut;
+    cut.reserve(assumptions.size());
+    for (const auto &[v, val] : assumptions)
+        cut.insert(factory.make_lit(SATSPC::mkLit(v, !val)));
+    return cut;
+}
+
 bool LevelSolver::solve(const Substitution &assumptions) {
     if (options.verbose > 3) {
         std::cerr << "solving" << std::endl;
@@ -57,18 +85,11 @@ bool LevelSolver::solve(const Substitution &assumptions) {
             (*dprn)(i) << std::endl;
         std::cerr << "]" << std::endl;
     }
-    Eval ev(factory, assumptions);
-    for (const auto &i : constrs)
-        ev(i);
-    FindCut fc(factory, ev);
-    for (const auto &i : constrs)
-        fc(i);
-    const auto &cut = fc.get_cut();
+    std::unordered_set<ID> cut = find_cut(assumptions);
     SATCLS cut_clause;
     SATCLS_CAPACITY(cut_clause, cut.size());
     cut2id.clear();
-    for (const auto &l : fc.get_cut()) {
-        assert(ev(l) != SATSPC::l_Undef);
+    for (const auto &l : cut) {
         const auto el = enc(l);
         SATCLS_PUSH(cut_clause, el);
         cut2id[el] = l;
