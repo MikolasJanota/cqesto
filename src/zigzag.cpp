@@ -17,7 +17,7 @@ using SATSPC::lbool;
 using SATSPC::mkLit;
 
 void ZigZag::init() {
-    solvers.resize(levels->qlev_count() + 1, NULL);
+    solvers.resize(levels->qlev_count() + 1, nullptr);
     for (size_t ql = 0; ql <= levels->qlev_count(); ++ql) {
         const QuantifierType qt =
             ql < levels->qlev_count()
