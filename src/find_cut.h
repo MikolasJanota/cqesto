@@ -6,7 +6,7 @@
  */
 
 #pragma once
-#include "eval.h"
+#include "eval_up.h"
 #include "expressions.h"
 #include "visitor.h"
 #include <unordered_map>
@@ -15,7 +15,7 @@ class FindCut : MemoizedExpressionVisitor<bool> {
   public:
     typedef std::unordered_map<Var, bool> Vals;
 
-    FindCut(Expressions &factory, Eval &vals, std::unordered_set<ID> &pcut)
+    FindCut(Expressions &factory, EvalUp &vals, std::unordered_set<ID> &pcut)
         : MemoizedExpressionVisitor<bool>(factory), vals(vals), cut(pcut) {}
 
     void operator()(ID n) { visit(n); }
@@ -61,7 +61,7 @@ class FindCut : MemoizedExpressionVisitor<bool> {
     }
 
   private:
-    Eval &vals;
+    EvalUp &vals;
     std::unordered_set<ID> &cut;
     inline bool visit_ops(IDVector ops) {
         for (const auto &i : ops)

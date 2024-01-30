@@ -20,3 +20,4 @@ qcir_lex.c
 qcir_parse.tab.c
 qcir_parse.tab.h
 gmon.out
+Session.vim

@@ -7,7 +7,7 @@
 
 #include "level_solver.h"
 #include "auxiliary.h"
-#include "eval.h"
+#include "eval_up.h"
 #include "find_cut.h"
 #include "make_possible.h"
 #include "max_qlev.h"
@@ -24,7 +24,7 @@ LevelSolver::LevelSolver(const Options &options, Expressions &factory,
                          size_t lev, const LevelInfo &levs)
     : options(options), factory(factory), lev(lev), levs(levs),
       is_last(levs.qlev_count() <= lev), enc(factory, sat, variable_manager),
-      simpl(options, factory, enc), pol(factory, enc) {}
+      simpl(options, factory, enc), pol(factory, enc), inv(factory) {}
 
 void LevelSolver::add_var(Var v, VarType vt) {
     assert(constrs.empty());
@@ -46,6 +46,9 @@ void LevelSolver::add_constr(ID c) {
     sat.addClause(enc(strengthening));
     if (options.polarities)
         pol(strengthening);
+
+    if (!is_last && !options.simple_cut)
+        inv(c); // add to inverted graph
 }
 
 std::unordered_set<ID> LevelSolver::find_cut(const Substitution &assumptions) {
@@ -62,9 +65,9 @@ std::unordered_set<ID> LevelSolver::find_cut(const Substitution &assumptions) {
 
 std::unordered_set<ID>
 LevelSolver::find_cut_orig(const Substitution &assumptions) {
-    Eval ev(factory, assumptions);
-    for (const auto &i : constrs)
-        ev(i);
+    EvalUp ev(factory, assumptions, inv.inv());
+    /* for (const auto &i : constrs) */
+    /*     ev(i); */
     std::unordered_set<ID> cut;
     FindCut fc(factory, ev, cut);
     for (const auto &i : constrs)
@@ -84,11 +87,8 @@ LevelSolver::find_cut_simple(const Substitution &assumptions) {
 bool LevelSolver::solve(const Substitution &assumptions) {
     std::unordered_set<ID> cut = find_cut(assumptions);
     if (options.verbose > 3) {
-        std::cerr << "solving" << std::endl;
-        std::cerr << "assump";
-        for (const auto &i : assumptions)
-            (*dprn) << " " << mkLit(i.first, !(i.second));
-        std::cerr << " [" << std::endl;
+        std::cerr << "solving@" << lev << std::endl;
+        (*dprn) << "assump" << assumptions << " [\n";
         for (const auto &i : constrs)
             (*dprn)(i) << std::endl;
         std::cerr << "]" << std::endl;

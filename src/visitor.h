@@ -208,7 +208,7 @@ class NiceExpressionPrinter
         return *this;
     }
 
-    NiceExpressionPrinter &operator<<(std::unordered_set<ID> ns) {
+    NiceExpressionPrinter &operator<<(const std::unordered_set<ID> &ns) {
         auto &s = *this;
         s << "{";
         bool f = true;
@@ -221,7 +221,20 @@ class NiceExpressionPrinter
         return s << "}";
     }
 
-    NiceExpressionPrinter &operator<<(std::vector<ID> ns) {
+    NiceExpressionPrinter &operator<<(const std::unordered_map<Var, bool> &vs) {
+        auto &s = *this;
+        s << "{";
+        bool f = true;
+        for (const auto &[var, val] : vs) {
+            if (!f)
+                s << ",";
+            f = false;
+            s << var << ":" << val;
+        }
+        return s << "}";
+    }
+
+    NiceExpressionPrinter &operator<<(const std::vector<ID> &ns) {
         auto &s = *this;
         s << "[";
         bool f = true;
@@ -232,6 +245,11 @@ class NiceExpressionPrinter
             s << n;
         }
         return s << "]";
+    }
+
+    NiceExpressionPrinter &operator<<(const bool v) {
+        output << v;
+        return *this;
     }
 
     NiceExpressionPrinter &operator<<(const char c) {
