@@ -24,7 +24,7 @@ class EvalUp {
         run();
     }
 
-    SATSPC::lbool operator()(const ID &n) {
+    SATSPC::lbool operator()(const ID &n) const {
         assert(m_was_run);
         const auto i = m_vals.find(n);
         return i == m_vals.end()

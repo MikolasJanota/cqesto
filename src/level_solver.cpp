@@ -9,6 +9,7 @@
 #include "auxiliary.h"
 #include "eval_up.h"
 #include "find_cut.h"
+#include "find_cut_no_rec.h"
 #include "make_possible.h"
 #include "max_qlev.h"
 #include "minisat/core/SolverTypes.h"
@@ -69,7 +70,8 @@ LevelSolver::find_cut_orig(const Substitution &assumptions) {
     /* for (const auto &i : constrs) */
     /*     ev(i); */
     std::unordered_set<ID> cut;
-    FindCut fc(factory, ev, cut);
+    /* FindCut fc(factory, ev, cut); */
+    FindCutNoRec fc(factory, ev, cut);
     for (const auto &i : constrs)
         fc(i);
     return cut;
