@@ -49,7 +49,7 @@ void LevelSolver::add_constr(ID c) {
         pol(strengthening);
 
     if (!is_last && !options.simple_cut)
-        inv(c); // add to inverted graph
+        inv(strengthening); // add to inverted graph
 }
 
 std::unordered_set<ID> LevelSolver::find_cut(const Substitution &assumptions) {
@@ -67,11 +67,12 @@ std::unordered_set<ID> LevelSolver::find_cut(const Substitution &assumptions) {
 std::unordered_set<ID>
 LevelSolver::find_cut_orig(const Substitution &assumptions) {
     EvalUp ev(factory, assumptions, inv.inv());
+    /* Eval ev(factory, assumptions); */
     /* for (const auto &i : constrs) */
     /*     ev(i); */
     std::unordered_set<ID> cut;
-    /* FindCut fc(factory, ev, cut); */
-    FindCutNoRec fc(factory, ev, cut);
+    FindCut fc(factory, ev, cut);
+    /* FindCutNoRec fc(factory, ev, cut); */
     for (const auto &i : constrs)
         fc(i);
     return cut;

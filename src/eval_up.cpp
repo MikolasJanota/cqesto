@@ -24,6 +24,7 @@ void EvalUp::run() {
         const auto [_, success] = m_vals.insert({top, val});
         if (!success)
             continue; // already propagated
+        /* m_np << "top,val:" << top << " " << val << '\n'; */
         const auto it = m_inv.find(top);
         if (it == m_inv.end())
             continue; // no parents

@@ -6,6 +6,8 @@
  */
 #pragma once
 #include "expressions.h"
+#include "minisat/core/SolverTypes.h"
+#include "sat_interface.h"
 #include <unordered_set>
 #include <vector>
 
@@ -247,6 +249,17 @@ class NiceExpressionPrinter
         return s << "]";
     }
 
+    NiceExpressionPrinter &operator<<(const SATSPC::lbool v) {
+        if (v == SATSPC::l_Undef)
+            output << "?";
+        else if (v == SATSPC::l_True)
+            output << "+";
+        else if (v == SATSPC::l_False)
+            output << "-";
+        else
+            assert(false);
+        return *this;
+    }
     NiceExpressionPrinter &operator<<(const bool v) {
         output << v;
         return *this;
