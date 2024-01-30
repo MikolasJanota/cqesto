@@ -26,6 +26,8 @@ class EvalUp {
 
     SATSPC::lbool operator()(const ID &n) const {
         assert(m_was_run);
+        if (n.get_type()==FALSE) return SATSPC::l_False; 
+        if (n.get_type()==TRUE) return SATSPC::l_True; 
         const auto i = m_vals.find(n);
         return i == m_vals.end()
                    ? SATSPC::l_Undef
