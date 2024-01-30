@@ -70,8 +70,8 @@ LevelSolver::find_cut_orig(const Substitution &assumptions) {
     /* for (const auto &i : constrs) */
     /*     ev(i); */
     std::unordered_set<ID> cut;
-    /* FindCut fc(factory, ev, cut); */
-    FindCutNoRec fc(factory, ev, cut);
+    FindCut fc(factory, ev, cut);
+    /* FindCutNoRec fc(factory, ev, cut); */
     for (const auto &i : constrs)
         fc(i);
     return cut;
