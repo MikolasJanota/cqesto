@@ -6,6 +6,7 @@
  */
 #pragma once
 #include "encoder_to_sat.h"
+#include "eval_up.h"
 #include "expressions.h"
 #include "inversion.h"
 #include "level_info.h"
@@ -53,7 +54,7 @@ class LevelSolver {
     std::unordered_map<Lit, ID> cut2id;
     Simplify simpl;
     SetPolarities pol;
-    MkInversion inv;
+    EvalUp eval;
     bool lastSolve;
     std::unordered_set<ID> find_cut(const Substitution &assumptions);
     std::unordered_set<ID> find_cut_orig(const Substitution &assumptions);

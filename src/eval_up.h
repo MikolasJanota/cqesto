@@ -10,6 +10,7 @@
 #include "sat_interface.h"
 #include "visitor.h"
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 namespace qesto {
 
@@ -18,16 +19,17 @@ class EvalUp {
   public:
     /** Given expression factory,  substitutions into (some) variables, and
      * inverted  formula graph. */
-    EvalUp(Expressions &factory, const Substitution &var_vals,
-           const std::unordered_map<ID, std::vector<ID>> &inv)
-        : m_factory(factory), m_var_vals(var_vals), m_inv(inv) {
-        run();
-    }
+    EvalUp(Expressions &factory) : m_factory(factory) {}
+
+    void init(const ID &n);
+    void run(const Substitution &var_vals);
 
     SATSPC::lbool operator()(const ID &n) const {
         assert(m_was_run);
-        if (n.get_type()==FALSE) return SATSPC::l_False; 
-        if (n.get_type()==TRUE) return SATSPC::l_True; 
+        if (n.get_type() == FALSE)
+            return SATSPC::l_False;
+        if (n.get_type() == TRUE)
+            return SATSPC::l_True;
         const auto i = m_vals.find(n);
         return i == m_vals.end()
                    ? SATSPC::l_Undef
@@ -36,31 +38,20 @@ class EvalUp {
 
   private:
     Expressions &m_factory;
-    const Substitution &m_var_vals;
     bool m_was_run = false;
     std::unordered_map<ID, bool> m_vals;
-    const std::unordered_map<ID, std::vector<ID>> &m_inv;
+    std::unordered_map<ID, std::vector<ID>> m_push_neg;
+    std::unordered_map<ID, std::vector<ID>> m_push[2];
+    std::unordered_map<ID, std::unordered_set<ID>> m_may[2];
+    std::unordered_set<ID> m_seen;
+    size_t ix(bool b) const { return b ? 1 : 0; }
 
     std::vector<pair<ID, bool>> m_todo; // stack of (node,prop_val)
-    std::unordered_map<ID, size_t>
-        m_score; //  for in AND how many children are propagated true, for OR
-                 //  how many are false
-
-    /** bump score of the given node, return true iff the number of children is
-     * equal to the score */
-    bool bump_score(const ID &p) {
-        auto &f = m_factory;
-        assert(p.get_type() == AND || p.get_type() == OR);
-        auto i = m_score.find(p);
-        const auto num_ops =
-            p.get_type() == AND ? f.open_and(p).size() : f.open_or(p).size();
-        if (i == m_score.end()) {
-            m_score.insert(i, {p, 1});
-            return num_ops == 1;
-        }
-        i->second = i->second + 1;
-        return num_ops == i->second;
-    }
+                                        //
+    void push_may(std::unordered_map<ID, std::unordered_set<ID>> &push, ID n,
+                  bool val);
+    void push_all(const std::unordered_map<ID, std::vector<ID>> &push, ID n,
+                  bool val);
     void push_to_parent(const ID &p, bool val);
     void run();
 };

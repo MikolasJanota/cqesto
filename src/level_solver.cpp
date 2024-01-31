@@ -25,7 +25,7 @@ LevelSolver::LevelSolver(const Options &options, Expressions &factory,
                          size_t lev, const LevelInfo &levs)
     : options(options), factory(factory), lev(lev), levs(levs),
       is_last(levs.qlev_count() <= lev), enc(factory, sat, variable_manager),
-      simpl(options, factory, enc), pol(factory, enc), inv(factory) {}
+      simpl(options, factory, enc), pol(factory, enc), eval(factory) {}
 
 void LevelSolver::add_var(Var v, VarType vt) {
     assert(constrs.empty());
@@ -49,7 +49,7 @@ void LevelSolver::add_constr(ID c) {
         pol(strengthening);
 
     if (!is_last && !options.simple_cut)
-        inv(strengthening); // add to inverted graph
+        eval.init(strengthening); // add to inverted graph
 }
 
 std::unordered_set<ID> LevelSolver::find_cut(const Substitution &assumptions) {
@@ -66,12 +66,12 @@ std::unordered_set<ID> LevelSolver::find_cut(const Substitution &assumptions) {
 
 std::unordered_set<ID>
 LevelSolver::find_cut_orig(const Substitution &assumptions) {
-    EvalUp ev(factory, assumptions, inv.inv());
     /* Eval ev(factory, assumptions); */
     /* for (const auto &i : constrs) */
     /*     ev(i); */
     std::unordered_set<ID> cut;
-    FindCut fc(factory, ev, cut);
+    eval.run(assumptions);
+    FindCut fc(factory, eval, cut);
     /* FindCutNoRec fc(factory, ev, cut); */
     for (const auto &i : constrs)
         fc(i);
