@@ -13,6 +13,7 @@
 #include "sat_interface.h"
 #include "set_polarities.h"
 #include "simplify.h"
+#include "max_qlev.h"
 #include <random>
 #include <unordered_map>
 namespace qesto {
@@ -56,6 +57,7 @@ class LevelSolver {
     SetPolarities pol;
     EvalUp eval;
     bool lastSolve;
+    MaxQLev mql;
     std::unordered_set<ID> find_cut(const Substitution &assumptions);
     std::unordered_set<ID> find_cut_orig(const Substitution &assumptions);
     std::unordered_set<ID> find_cut_simple(const Substitution &assumptions);
