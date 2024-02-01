@@ -28,7 +28,7 @@ LevelSolver::LevelSolver(const Options &options, StatisticsManager &stats,
     : options(options), m_statistics(stats), factory(factory), lev(lev),
       levs(levs), is_last(levs.qlev_count() <= lev),
       enc(factory, sat, variable_manager), simpl(options, factory, enc),
-      pol(factory, enc), eval(factory) {}
+      pol(factory, enc), eval(factory), mql(factory, plvars, levs) {}
 
 void LevelSolver::add_var(Var v, VarType vt) {
     assert(constrs.empty());
@@ -123,7 +123,6 @@ bool LevelSolver::solve(const Substitution &assumptions) {
 }
 
 int LevelSolver::analyze() {
-    MaxQLev mql(factory, plvars, levs);
     int bt = -1;
     const auto &confl = sat.get_conflict();
     for (auto i = confl.size(); i--;) {

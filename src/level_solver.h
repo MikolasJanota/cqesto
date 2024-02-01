@@ -10,6 +10,7 @@
 #include "expressions.h"
 #include "inversion.h"
 #include "level_info.h"
+#include "max_qlev.h"
 #include "sat_interface.h"
 #include "set_polarities.h"
 #include "simplify.h"
@@ -58,6 +59,7 @@ class LevelSolver {
     SetPolarities pol;
     EvalUp eval;
     bool lastSolve;
+    MaxQLev mql;
     std::unordered_set<ID> find_cut(const Substitution &assumptions);
     std::unordered_set<ID> find_cut_orig(const Substitution &assumptions);
     std::unordered_set<ID> find_cut_simple(const Substitution &assumptions);
