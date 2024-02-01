@@ -7,6 +7,7 @@
 
 #include "level_solver.h"
 #include "auxiliary.h"
+#include "dbg_cmp_eval.h"
 #include "eval_up.h"
 #include "find_cut.h"
 #include "find_cut_no_rec.h"
@@ -72,6 +73,10 @@ LevelSolver::find_cut_orig(const Substitution &assumptions) {
     std::unordered_set<ID> cut;
     eval.run(assumptions);
     FindCut fc(factory, eval, cut);
+    /* DbgCmpEval cmp(factory, *dprn, ev, eval); */
+    /* for (const auto &i : constrs) */
+    /*     assert(cmp(i)); */
+    /* FindCut fc(factory, ev, cut); */
     /* FindCutNoRec fc(factory, ev, cut); */
     for (const auto &i : constrs)
         fc(i);
@@ -88,15 +93,18 @@ LevelSolver::find_cut_simple(const Substitution &assumptions) {
 }
 
 bool LevelSolver::solve(const Substitution &assumptions) {
-    std::unordered_set<ID> cut = find_cut(assumptions);
     if (options.verbose > 3) {
         std::cerr << "solving@" << lev << std::endl;
         (*dprn) << "assump" << assumptions << " [\n";
         for (const auto &i : constrs)
             (*dprn)(i) << std::endl;
         std::cerr << "]" << std::endl;
-        (*dprn) << "cut:" << cut << '\n';
     }
+
+    std::unordered_set<ID> cut = find_cut(assumptions);
+
+    if (options.verbose > 3)
+        (*dprn) << "cut:" << cut << '\n';
     SATCLS cut_clause;
     SATCLS_CAPACITY(cut_clause, cut.size());
     cut2id.clear();

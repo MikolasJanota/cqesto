@@ -30,6 +30,7 @@ void EvalUp::run(const Substitution &var_vals) {
         /* m_np << "top,val:" << top << " " << val << '\n'; */
         // go through parents
         push_all(m_push[ix(val)], top, val);
+        push_all(m_push_neg, top, !val);
         push_may(m_may[ix(val)], top, val);
     }
     m_was_run = true;

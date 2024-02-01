@@ -231,7 +231,7 @@ class NiceExpressionPrinter
             if (!f)
                 s << ",";
             f = false;
-            s << var << ":" << val;
+            s << (val ? '+' : '-') << var;
         }
         return s << "}";
     }
