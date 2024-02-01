@@ -13,14 +13,15 @@
 #include "sat_interface.h"
 #include "set_polarities.h"
 #include "simplify.h"
+#include "statistics.h"
 #include <random>
 #include <unordered_map>
 namespace qesto {
 class LevelSolver {
   public:
     enum VarType { PLAYER, OPPONENT, AUX };
-    LevelSolver(const Options &options, Expressions &factory, size_t lev,
-                const LevelInfo &levs);
+    LevelSolver(const Options &options, StatisticsManager &statistics,
+                Expressions &factory, size_t lev, const LevelInfo &levs);
     void add_var(Var v, VarType player);
     void add_constr(ID c);
     bool solve(const Substitution &assumptions);
@@ -40,6 +41,7 @@ class LevelSolver {
   private:
     static std::mt19937 rgen;
     const Options &options;
+    StatisticsManager &m_statistics;
     Expressions &factory;
     const size_t lev;
     const LevelInfo &levs;

@@ -9,6 +9,7 @@
 #include "options.h"
 #include "qesto_qcir_parser.h"
 #include "qtypes.h"
+#include "statistics.h"
 #include "variable_manager.h"
 #include "version.h"
 #include "visitor.h"
@@ -18,10 +19,14 @@
 using namespace std;
 
 qesto::ZigZag *ps = nullptr;
+StatisticsManager stats;
+static double start_time;
 static void SIG_handler(int signum);
+static void print_stats();
 
 unordered_map<int, std::string> var2name;
 int main(int argc, char **argv) {
+    start_time = read_cpu_time();
 #ifndef NDEBUG
     cout << "c DEBUG version." << endl;
     cout << "c Should not be used for heavy computation!" << endl;
@@ -115,7 +120,7 @@ int main(int argc, char **argv) {
     for (auto i : parser.name2var())
         var2name[i.second] = i.first;
     qesto::NiceExpressionPrinter dprn(*factory, var2name, cout);
-    ps = new qesto::ZigZag(options, *factory, parser.formula(), dprn);
+    ps = new qesto::ZigZag(options, stats, *factory, parser.formula(), dprn);
     bool res;
     if (options.enumerate) {
         const int count = ps->solve_all();
@@ -125,8 +130,10 @@ int main(int argc, char **argv) {
         res = ps->solve();
     }
     std::cout << "c solved " << read_cpu_time() << std::endl;
-    ps->print_stats(cerr);
     std::cout << "s cnf " << (res ? '1' : '0') << std::endl;
+
+    stats.totalTime->inc(read_cpu_time() - start_time);
+    print_stats();
 #ifndef NDEBUG
     delete ps;
     delete factory;
@@ -137,10 +144,16 @@ int main(int argc, char **argv) {
 
 static void SIG_handler(int signum) {
     if (ps)
-        ps->print_stats(cerr);
+        print_stats();
     else
         cerr << "c Solver not yet initialized." << endl;
     cerr << "# received external signal " << signum << endl;
     cerr << "Terminating ..." << endl;
     exit(0);
+}
+
+static void print_stats() {
+    for (const auto s : stats.all)
+        if (s->should_print())
+            s->print(std::cerr << "c ") << std::endl;
 }

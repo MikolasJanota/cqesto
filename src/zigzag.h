@@ -9,16 +9,17 @@
 #include "level_info.h"
 #include "level_solver.h"
 #include "qtypes.h"
+#include "statistics.h"
 #include <memory>
 #include <vector>
 namespace qesto {
 
 class ZigZag {
   public:
-    ZigZag(const Options &options, Expressions &factory, const QFla &qf,
-           NiceExpressionPrinter &prn)
-        : options(options), factory(factory), d_prn(prn), formula(qf),
-          conflict_count(0), verb(options.verbose) {
+    ZigZag(const Options &options, StatisticsManager &statistics,
+           Expressions &factory, const QFla &qf, NiceExpressionPrinter &prn)
+        : options(options), m_statistics(statistics), factory(factory),
+          d_prn(prn), formula(qf), verb(options.verbose) {
 
         if (options.enumerate && !formula.pref.empty()) {
             auto &block = formula.pref[0].second;
@@ -38,9 +39,6 @@ class ZigZag {
 
     bool solve();
     int solve_all();
-    std::ostream &print_stats(std::ostream &o) {
-        return o << "c bt_count:" << conflict_count << std::endl;
-    }
 
   private:
     SATSPC::lbool solve_(int confl_budget);
@@ -56,12 +54,12 @@ class ZigZag {
     };
 
     const Options &options;
+    StatisticsManager &m_statistics;
     Expressions &factory;
     NiceExpressionPrinter &d_prn;
     std::unique_ptr<LevelInfo> levels;
     QFla formula;
     std::vector<LevelSolver *> solvers;
-    size_t conflict_count;
     void init();
     int verb;
 };

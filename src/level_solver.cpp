@@ -7,7 +7,7 @@
 
 #include "level_solver.h"
 #include "auxiliary.h"
-#include "dbg_cmp_eval.h"
+/* #include "dbg_cmp_eval.h" */
 #include "eval_up.h"
 #include "find_cut.h"
 #include "find_cut_no_rec.h"
@@ -22,11 +22,13 @@ using namespace qesto;
 using SATSPC::mkLit;
 std::mt19937 LevelSolver::rgen(1);
 
-LevelSolver::LevelSolver(const Options &options, Expressions &factory,
-                         size_t lev, const LevelInfo &levs)
-    : options(options), factory(factory), lev(lev), levs(levs),
-      is_last(levs.qlev_count() <= lev), enc(factory, sat, variable_manager),
-      simpl(options, factory, enc), pol(factory, enc), eval(factory) {}
+LevelSolver::LevelSolver(const Options &options, StatisticsManager &stats,
+                         Expressions &factory, size_t lev,
+                         const LevelInfo &levs)
+    : options(options), m_statistics(stats), factory(factory), lev(lev),
+      levs(levs), is_last(levs.qlev_count() <= lev),
+      enc(factory, sat, variable_manager), simpl(options, factory, enc),
+      pol(factory, enc), eval(factory) {}
 
 void LevelSolver::add_var(Var v, VarType vt) {
     assert(constrs.empty());
@@ -113,7 +115,10 @@ bool LevelSolver::solve(const Substitution &assumptions) {
         SATCLS_PUSH(cut_clause, el);
         cut2id[el] = l;
     }
+    const auto start_time = read_cpu_time();
     lastSolve = sat.solve(cut_clause);
+    m_statistics.satTime->inc(read_cpu_time() - start_time);
+    m_statistics.satCalls->inc();
     return lastSolve;
 }
 

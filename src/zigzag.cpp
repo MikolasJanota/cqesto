@@ -23,7 +23,8 @@ void ZigZag::init() {
             ql < levels->qlev_count()
                 ? levels->level_type(ql)
                 : opponent(levels->level_type(levels->qlev_count() - 1));
-        solvers[ql] = new LevelSolver(options, factory, ql, *(levels.get()));
+        solvers[ql] = new LevelSolver(options, m_statistics, factory, ql,
+                                      *(levels.get()));
         LevelSolver &s = *(solvers[ql]);
         s.dprn = &d_prn;
         for (size_t j = 0; j <= std::min(ql, levels->qlev_count() - 1); ++j) {
@@ -163,11 +164,12 @@ lbool ZigZag::solve_(int confl_budget) {
             }
             ++lev;
         } else {
-            ++conflict_count;
+            m_statistics.bts->inc();
             if (confl_budget > 0)
                 confl_budget--;
             if (verb)
-                std::cerr << "conflicts:" << conflict_count << std::endl;
+                std::cerr << "conflicts:" << m_statistics.bts->get()
+                          << std::endl;
             const int bt = solvers[lev]->analyze();
             if (verb)
                 std::cerr << "bt:" << bt << std::endl;
