@@ -104,7 +104,7 @@ void EvalUp::init(const ID &node) {
             const auto [_, succ] = m_seen.insert(top);
             if (!succ)
                 continue;
-            const auto nn = m_factory.open_not(top);
+            const auto& nn = m_factory.open_not(top);
             add_edge(m_push_neg, nn, top);
             todo.push_back(nn);
         } break;
@@ -113,14 +113,14 @@ void EvalUp::init(const ID &node) {
             const auto [_, succ] = m_seen.insert(top);
             if (!succ)
                 continue;
-            const auto &ops = top.get_type() == AND ? m_factory.open_and(top)
-                                                    : m_factory.open_or(top);
-            auto &push = m_push[ix(top.get_type() == OR)];
+            const bool is_and = top.get_type() == AND ; 
+            const auto &ops = is_and ? m_factory.open_and(top) : m_factory.open_or(top);
+            auto &push = m_push[ix(!is_and)];
             for (const auto &op : ops) {
                 add_edge(push, op, top);
                 todo.push_back(op);
             }
-            auto &may = m_may[ix(top.get_type() == AND)];
+            auto &may = m_may[ix(is_and)];
             add_edge(may, ops[0], top);
         } break;
         case FALSE:
