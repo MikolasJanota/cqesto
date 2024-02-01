@@ -99,10 +99,11 @@ void QCIRParser::gate_stmt() {
 }
 
 void QCIRParser::qblock_prefix() {
-    free_quant();
+    size_t counter = 0;
     while (!is_end()) {
-        if (!qblock_quant())
+        if (!qblock_quant(counter))
             break;
+        counter++;
     }
 }
 
@@ -117,18 +118,7 @@ void QCIRParser::var_list() {
     nltoken();
 }
 
-bool QCIRParser::free_quant() {
-    skip();
-    if (*d_buf != 'f' && *d_buf != 'F')
-        return false;
-    match_string("free");
-    cb_qblock_quant(QType::FREE);
-    var_list();
-    cb_quant_closed();
-    return true;
-}
-
-bool QCIRParser::qblock_quant() {
+bool QCIRParser::qblock_quant(size_t counter) {
     skip();
     switch (*d_buf) {
     case 'e':
@@ -137,12 +127,24 @@ bool QCIRParser::qblock_quant() {
         cb_qblock_quant(QType::EXIST);
         break;
     case 'f':
-    case 'F':
-        match_string("forall");
-        cb_qblock_quant(QType::FORALL);
-        break;
+    case 'F': {
+        if (counter == 0) {
+            ++d_buf;
+            if (*d_buf == 'r' && *d_buf == 'R') {
+                match_string("ree");
+                cb_qblock_quant(QType::FREE);
+            } else {
+                match_string("orall");
+                cb_qblock_quant(QType::FORALL);
+            }
+        } else {
+            match_string("forall");
+            cb_qblock_quant(QType::FORALL);
+        }
+    } break;
     default: return false;
     }
+
     var_list();
     cb_quant_closed();
     return true;

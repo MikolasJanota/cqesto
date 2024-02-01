@@ -40,8 +40,7 @@ class QCIRParser {
     void gate_stmt();
     void format_id();
     void qblock_prefix();
-    bool qblock_quant();
-    bool free_quant();
+    bool qblock_quant(size_t counter);
     void var_list();
     std::string var();
     void lit_list();
