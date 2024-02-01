@@ -3,7 +3,9 @@
 # Author:  mikolas
 # Created on:  Sat Jul 29 12:36:05 CEST 2023
 # Copyright (C) 2023, Mikolas Janota
-import sys, random
+import sys
+import random
+
 NT_CNT=5
 (LITERAL,AND,OR,XOR,ITE)=range(NT_CNT)
 
