@@ -87,21 +87,20 @@ template <class T, class HashFun> class ImmutableVector {
     size_t _hash_code;
     size_t _size;
     Data *_data;
-    inline size_t decrease(); // decrease reference counter
+    inline void decrease(); // decrease reference counter
 };
 
 template <class T, class HashFun>
-inline size_t ImmutableVector<T, HashFun>::decrease() {
+inline void ImmutableVector<T, HashFun>::decrease() {
     if (_data == nullptr)
-        return 0;
+        return;
     assert(_data->count);
-    const size_t nv = --(_data->count);
+    --(_data->count);
     if ((_data->count) == 0) {
         delete[] _data->elements;
         delete _data;
     }
     _data = nullptr;
-    return nv;
 }
 
 template <class T, class HashFun>

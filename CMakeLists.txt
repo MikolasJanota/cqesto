@@ -27,6 +27,7 @@ endif()
 
 # Add sanitizer flags for C++ compiler for "Debug" configuration
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address,undefined,bool")
+set(CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fsanitize=address,undefined,bool")
 
 ## https://stackoverflow.com/questions/1435953/how-can-i-pass-git-sha1-to-compiler-as-definition-using-cmake
 # the commit's SHA1, and whether the building workspace was dirty or not
