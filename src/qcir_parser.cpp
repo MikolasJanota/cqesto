@@ -130,7 +130,7 @@ bool QCIRParser::qblock_quant(size_t counter) {
     case 'F': {
         if (counter == 0) {
             ++d_buf;
-            if (*d_buf == 'r' && *d_buf == 'R') {
+            if (*d_buf == 'r' || *d_buf == 'R') {
                 match_string("ree");
                 cb_qblock_quant(QType::FREE);
             } else {
